@@ -1,0 +1,925 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1C5B344D1CF6A1A700271B7C /* WspxDownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34391CF6A1A700271B7C /* WspxDownloadItem.m */; };
+		1C5B344E1CF6A1A700271B7C /* WspxDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B343B1CF6A1A700271B7C /* WspxDownloadManager.m */; };
+		1C5B34511CF6A1A700271B7C /* HWIFileDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34471CF6A1A700271B7C /* HWIFileDownloader.m */; };
+		1C5B34521CF6A1A700271B7C /* HWIFileDownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34491CF6A1A700271B7C /* HWIFileDownloadItem.m */; };
+		1C5B34531CF6A1A700271B7C /* HWIFileDownloadProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B344B1CF6A1A700271B7C /* HWIFileDownloadProgress.m */; };
+		1C5B34551CF6A29200271B7C /* WspxDownloadItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34381CF6A1A700271B7C /* WspxDownloadItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C5B34561CF6A29200271B7C /* WspxDownloadManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B343A1CF6A1A700271B7C /* WspxDownloadManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C5B34591CF6A29C00271B7C /* HWIBackgroundSessionCompletionHandlerBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34441CF6A1A700271B7C /* HWIBackgroundSessionCompletionHandlerBlock.h */; };
+		1C5B345A1CF6A29C00271B7C /* HWIFileDownloadDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34451CF6A1A700271B7C /* HWIFileDownloadDelegate.h */; };
+		1C5B345B1CF6A29C00271B7C /* HWIFileDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34461CF6A1A700271B7C /* HWIFileDownloader.h */; };
+		1C5B345C1CF6A29C00271B7C /* HWIFileDownloadItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34481CF6A1A700271B7C /* HWIFileDownloadItem.h */; };
+		1C5B345D1CF6A29C00271B7C /* HWIFileDownloadProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B344A1CF6A1A700271B7C /* HWIFileDownloadProgress.h */; };
+		1C5B345E1CF6A29C00271B7C /* UOneMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B344C1CF6A1A700271B7C /* UOneMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C5B34621CF6A2E900271B7C /* UOneDownloadTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B345F1CF6A2E900271B7C /* UOneDownloadTableViewCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C5B34631CF6A2E900271B7C /* UOneDownloadTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34601CF6A2E900271B7C /* UOneDownloadTableViewCell.m */; };
+		1C5B34671CF6A30400271B7C /* UOneDownloadViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34641CF6A30400271B7C /* UOneDownloadViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C5B34681CF6A30400271B7C /* UOneDownloadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34651CF6A30400271B7C /* UOneDownloadViewController.m */; };
+		1C5B346B1CF6CBFB00271B7C /* UOneDownloadTableViewCell.xib in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34611CF6A2E900271B7C /* UOneDownloadTableViewCell.xib */; };
+		1C5B34951CF6D56600271B7C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34941CF6D56600271B7C /* main.m */; };
+		1C5B34981CF6D56600271B7C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34971CF6D56600271B7C /* AppDelegate.m */; };
+		1C5B349B1CF6D56600271B7C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B349A1CF6D56600271B7C /* ViewController.m */; };
+		1C5B349E1CF6D56600271B7C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1C5B349C1CF6D56600271B7C /* Main.storyboard */; };
+		1C5B34A01CF6D56600271B7C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C5B349F1CF6D56600271B7C /* Assets.xcassets */; };
+		1C5B34A31CF6D56600271B7C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1C5B34A11CF6D56600271B7C /* LaunchScreen.storyboard */; };
+		1C5B34A81CF6D57100271B7C /* libUOneMedia.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C5B34231CF69F9C00271B7C /* libUOneMedia.a */; };
+		1C5B34A91CF6D57C00271B7C /* UOneMedia.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1C5B34301CF69FBE00271B7C /* UOneMedia.bundle */; };
+		1C5B34AC1CF6D6DE00271B7C /* NSBundle+WspxUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34AA1CF6D6DE00271B7C /* NSBundle+WspxUtility.h */; };
+		1C5B34AD1CF6D6DE00271B7C /* NSBundle+WspxUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34AB1CF6D6DE00271B7C /* NSBundle+WspxUtility.m */; };
+		1C5B34AF1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34AE1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch */; };
+		1C5B34B51CF7049F00271B7C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C5B34B41CF7049F00271B7C /* Images.xcassets */; };
+		1C5B34B71CF7096700271B7C /* UOneMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34B61CF7096700271B7C /* UOneMedia.m */; };
+		B61D579B1CFEEF0200EE66F0 /* PKDownloadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA641CFC527000DEE8CE /* PKDownloadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63474AB1D057A73001B3B20 /* UoneDownloadToolbar.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474A91D057A73001B3B20 /* UoneDownloadToolbar.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63474AC1D057A73001B3B20 /* UoneDownloadToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474AA1D057A73001B3B20 /* UoneDownloadToolbar.m */; };
+		B63474F41D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474E81D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63474F51D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474E91D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m */; };
+		B63474F61D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474E91D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m */; };
+		B63474F71D059B9B001B3B20 /* SWCellScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474EA1D059B9B001B3B20 /* SWCellScrollView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63474F81D059B9B001B3B20 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474EB1D059B9B001B3B20 /* SWCellScrollView.m */; };
+		B63474F91D059B9B001B3B20 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474EB1D059B9B001B3B20 /* SWCellScrollView.m */; };
+		B63474FA1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474EC1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63474FB1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474ED1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m */; };
+		B63474FC1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474ED1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m */; };
+		B63474FD1D059B9B001B3B20 /* SWTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474EE1D059B9B001B3B20 /* SWTableViewCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63474FE1D059B9B001B3B20 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474EF1D059B9B001B3B20 /* SWTableViewCell.m */; };
+		B63474FF1D059B9B001B3B20 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474EF1D059B9B001B3B20 /* SWTableViewCell.m */; };
+		B63475001D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474F01D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63475011D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F11D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m */; };
+		B63475021D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F11D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m */; };
+		B63475031D059B9B001B3B20 /* SWUtilityButtonView.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474F21D059B9B001B3B20 /* SWUtilityButtonView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B63475041D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */; };
+		B63475051D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */; };
+		B6F42C101D00155C0018D694 /* PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA651CFC527000DEE8CE /* PKDownloadButton.m */; };
+		B6F9CA711CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA5A1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA721CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */; };
+		B6F9CA731CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */; };
+		B6F9CA741CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */; };
+		B6F9CA751CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA5C1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA761CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5D1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m */; };
+		B6F9CA771CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5D1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m */; };
+		B6F9CA781CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5D1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m */; };
+		B6F9CA791CFC527000DEE8CE /* PKBorderedButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA5E1CFC527000DEE8CE /* PKBorderedButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA7A1CFC527000DEE8CE /* PKBorderedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5F1CFC527000DEE8CE /* PKBorderedButton.m */; };
+		B6F9CA7B1CFC527000DEE8CE /* PKBorderedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5F1CFC527000DEE8CE /* PKBorderedButton.m */; };
+		B6F9CA7C1CFC527000DEE8CE /* PKBorderedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5F1CFC527000DEE8CE /* PKBorderedButton.m */; };
+		B6F9CA7D1CFC527000DEE8CE /* PKCircleProgressView.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA601CFC527000DEE8CE /* PKCircleProgressView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA7E1CFC527000DEE8CE /* PKCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA611CFC527000DEE8CE /* PKCircleProgressView.m */; };
+		B6F9CA7F1CFC527000DEE8CE /* PKCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA611CFC527000DEE8CE /* PKCircleProgressView.m */; };
+		B6F9CA801CFC527000DEE8CE /* PKCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA611CFC527000DEE8CE /* PKCircleProgressView.m */; };
+		B6F9CA811CFC527000DEE8CE /* PKCircleView.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA621CFC527000DEE8CE /* PKCircleView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA821CFC527000DEE8CE /* PKCircleView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA631CFC527000DEE8CE /* PKCircleView.m */; };
+		B6F9CA831CFC527000DEE8CE /* PKCircleView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA631CFC527000DEE8CE /* PKCircleView.m */; };
+		B6F9CA841CFC527000DEE8CE /* PKCircleView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA631CFC527000DEE8CE /* PKCircleView.m */; };
+		B6F9CA861CFC527000DEE8CE /* PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA651CFC527000DEE8CE /* PKDownloadButton.m */; };
+		B6F9CA891CFC527000DEE8CE /* PKDownloadingButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA661CFC527000DEE8CE /* PKDownloadingButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA8A1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA671CFC527000DEE8CE /* PKDownloadingButton.m */; };
+		B6F9CA8B1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA671CFC527000DEE8CE /* PKDownloadingButton.m */; };
+		B6F9CA8C1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA671CFC527000DEE8CE /* PKDownloadingButton.m */; };
+		B6F9CA8D1CFC527000DEE8CE /* PKMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA681CFC527000DEE8CE /* PKMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA8E1CFC527000DEE8CE /* PKPauseDownloadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA691CFC527000DEE8CE /* PKPauseDownloadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA8F1CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6A1CFC527000DEE8CE /* PKPauseDownloadButton.m */; };
+		B6F9CA901CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6A1CFC527000DEE8CE /* PKPauseDownloadButton.m */; };
+		B6F9CA911CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6A1CFC527000DEE8CE /* PKPauseDownloadButton.m */; };
+		B6F9CA921CFC527000DEE8CE /* PKPendingView.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA6B1CFC527000DEE8CE /* PKPendingView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA931CFC527000DEE8CE /* PKPendingView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6C1CFC527000DEE8CE /* PKPendingView.m */; };
+		B6F9CA941CFC527000DEE8CE /* PKPendingView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6C1CFC527000DEE8CE /* PKPendingView.m */; };
+		B6F9CA951CFC527000DEE8CE /* PKPendingView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6C1CFC527000DEE8CE /* PKPendingView.m */; };
+		B6F9CA961CFC527000DEE8CE /* PKStopDownloadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA6D1CFC527000DEE8CE /* PKStopDownloadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA971CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6E1CFC527000DEE8CE /* PKStopDownloadButton.m */; };
+		B6F9CA981CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6E1CFC527000DEE8CE /* PKStopDownloadButton.m */; };
+		B6F9CA991CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA6E1CFC527000DEE8CE /* PKStopDownloadButton.m */; };
+		B6F9CA9A1CFC527000DEE8CE /* UIImage+PKDownloadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA6F1CFC527000DEE8CE /* UIImage+PKDownloadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B6F9CA9B1CFC527000DEE8CE /* UIImage+PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA701CFC527000DEE8CE /* UIImage+PKDownloadButton.m */; };
+		B6F9CA9C1CFC527000DEE8CE /* UIImage+PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA701CFC527000DEE8CE /* UIImage+PKDownloadButton.m */; };
+		B6F9CA9D1CFC527000DEE8CE /* UIImage+PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA701CFC527000DEE8CE /* UIImage+PKDownloadButton.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1C5B34211CF69F9C00271B7C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1C5B34231CF69F9C00271B7C /* libUOneMedia.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libUOneMedia.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C5B34301CF69FBE00271B7C /* UOneMedia.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UOneMedia.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C5B34321CF69FBE00271B7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1C5B34381CF6A1A700271B7C /* WspxDownloadItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WspxDownloadItem.h; sourceTree = "<group>"; };
+		1C5B34391CF6A1A700271B7C /* WspxDownloadItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WspxDownloadItem.m; sourceTree = "<group>"; };
+		1C5B343A1CF6A1A700271B7C /* WspxDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WspxDownloadManager.h; sourceTree = "<group>"; };
+		1C5B343B1CF6A1A700271B7C /* WspxDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WspxDownloadManager.m; sourceTree = "<group>"; };
+		1C5B34441CF6A1A700271B7C /* HWIBackgroundSessionCompletionHandlerBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWIBackgroundSessionCompletionHandlerBlock.h; sourceTree = "<group>"; };
+		1C5B34451CF6A1A700271B7C /* HWIFileDownloadDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWIFileDownloadDelegate.h; sourceTree = "<group>"; };
+		1C5B34461CF6A1A700271B7C /* HWIFileDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWIFileDownloader.h; sourceTree = "<group>"; };
+		1C5B34471CF6A1A700271B7C /* HWIFileDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWIFileDownloader.m; sourceTree = "<group>"; };
+		1C5B34481CF6A1A700271B7C /* HWIFileDownloadItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWIFileDownloadItem.h; sourceTree = "<group>"; };
+		1C5B34491CF6A1A700271B7C /* HWIFileDownloadItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWIFileDownloadItem.m; sourceTree = "<group>"; };
+		1C5B344A1CF6A1A700271B7C /* HWIFileDownloadProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWIFileDownloadProgress.h; sourceTree = "<group>"; };
+		1C5B344B1CF6A1A700271B7C /* HWIFileDownloadProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWIFileDownloadProgress.m; sourceTree = "<group>"; };
+		1C5B344C1CF6A1A700271B7C /* UOneMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UOneMedia.h; sourceTree = "<group>"; };
+		1C5B345F1CF6A2E900271B7C /* UOneDownloadTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UOneDownloadTableViewCell.h; sourceTree = "<group>"; };
+		1C5B34601CF6A2E900271B7C /* UOneDownloadTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UOneDownloadTableViewCell.m; sourceTree = "<group>"; };
+		1C5B34611CF6A2E900271B7C /* UOneDownloadTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UOneDownloadTableViewCell.xib; sourceTree = "<group>"; };
+		1C5B34641CF6A30400271B7C /* UOneDownloadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UOneDownloadViewController.h; sourceTree = "<group>"; };
+		1C5B34651CF6A30400271B7C /* UOneDownloadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UOneDownloadViewController.m; sourceTree = "<group>"; };
+		1C5B34911CF6D56600271B7C /* UOneMediaApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UOneMediaApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C5B34941CF6D56600271B7C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1C5B34961CF6D56600271B7C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		1C5B34971CF6D56600271B7C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		1C5B34991CF6D56600271B7C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		1C5B349A1CF6D56600271B7C /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		1C5B349D1CF6D56600271B7C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1C5B349F1CF6D56600271B7C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1C5B34A21CF6D56600271B7C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1C5B34A41CF6D56600271B7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1C5B34AA1CF6D6DE00271B7C /* NSBundle+WspxUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+WspxUtility.h"; sourceTree = "<group>"; };
+		1C5B34AB1CF6D6DE00271B7C /* NSBundle+WspxUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+WspxUtility.m"; sourceTree = "<group>"; };
+		1C5B34AE1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UOneMediaStaticLib_Prefix.pch; sourceTree = "<group>"; };
+		1C5B34B41CF7049F00271B7C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		1C5B34B61CF7096700271B7C /* UOneMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UOneMedia.m; path = UOneMediaStaticLib/UOneMedia.m; sourceTree = SOURCE_ROOT; };
+		B61D57931CFEC14600EE66F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		B61D57961CFEC1B200EE66F0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		B61D57981CFEC21700EE66F0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		B63474A91D057A73001B3B20 /* UoneDownloadToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UoneDownloadToolbar.h; sourceTree = "<group>"; };
+		B63474AA1D057A73001B3B20 /* UoneDownloadToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UoneDownloadToolbar.m; sourceTree = "<group>"; };
+		B63474E81D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+SWUtilityButtons.h"; sourceTree = "<group>"; };
+		B63474E91D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+SWUtilityButtons.m"; sourceTree = "<group>"; };
+		B63474EA1D059B9B001B3B20 /* SWCellScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellScrollView.h; sourceTree = "<group>"; };
+		B63474EB1D059B9B001B3B20 /* SWCellScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWCellScrollView.m; sourceTree = "<group>"; };
+		B63474EC1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWLongPressGestureRecognizer.h; sourceTree = "<group>"; };
+		B63474ED1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWLongPressGestureRecognizer.m; sourceTree = "<group>"; };
+		B63474EE1D059B9B001B3B20 /* SWTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewCell.h; sourceTree = "<group>"; };
+		B63474EF1D059B9B001B3B20 /* SWTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewCell.m; sourceTree = "<group>"; };
+		B63474F01D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonTapGestureRecognizer.h; sourceTree = "<group>"; };
+		B63474F11D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonTapGestureRecognizer.m; sourceTree = "<group>"; };
+		B63474F21D059B9B001B3B20 /* SWUtilityButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonView.h; sourceTree = "<group>"; };
+		B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonView.m; sourceTree = "<group>"; };
+		B6F9CA5A1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+PKDownloadButtonAnimations.h"; sourceTree = "<group>"; };
+		B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+PKDownloadButtonAnimations.m"; sourceTree = "<group>"; };
+		B6F9CA5C1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSLayoutConstraint+PKDownloadButton.h"; sourceTree = "<group>"; };
+		B6F9CA5D1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSLayoutConstraint+PKDownloadButton.m"; sourceTree = "<group>"; };
+		B6F9CA5E1CFC527000DEE8CE /* PKBorderedButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKBorderedButton.h; sourceTree = "<group>"; };
+		B6F9CA5F1CFC527000DEE8CE /* PKBorderedButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKBorderedButton.m; sourceTree = "<group>"; };
+		B6F9CA601CFC527000DEE8CE /* PKCircleProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKCircleProgressView.h; sourceTree = "<group>"; };
+		B6F9CA611CFC527000DEE8CE /* PKCircleProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKCircleProgressView.m; sourceTree = "<group>"; };
+		B6F9CA621CFC527000DEE8CE /* PKCircleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKCircleView.h; sourceTree = "<group>"; };
+		B6F9CA631CFC527000DEE8CE /* PKCircleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKCircleView.m; sourceTree = "<group>"; };
+		B6F9CA641CFC527000DEE8CE /* PKDownloadButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKDownloadButton.h; sourceTree = "<group>"; };
+		B6F9CA651CFC527000DEE8CE /* PKDownloadButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKDownloadButton.m; sourceTree = "<group>"; };
+		B6F9CA661CFC527000DEE8CE /* PKDownloadingButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKDownloadingButton.h; sourceTree = "<group>"; };
+		B6F9CA671CFC527000DEE8CE /* PKDownloadingButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKDownloadingButton.m; sourceTree = "<group>"; };
+		B6F9CA681CFC527000DEE8CE /* PKMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKMacros.h; sourceTree = "<group>"; };
+		B6F9CA691CFC527000DEE8CE /* PKPauseDownloadButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKPauseDownloadButton.h; sourceTree = "<group>"; };
+		B6F9CA6A1CFC527000DEE8CE /* PKPauseDownloadButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKPauseDownloadButton.m; sourceTree = "<group>"; };
+		B6F9CA6B1CFC527000DEE8CE /* PKPendingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKPendingView.h; sourceTree = "<group>"; };
+		B6F9CA6C1CFC527000DEE8CE /* PKPendingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKPendingView.m; sourceTree = "<group>"; };
+		B6F9CA6D1CFC527000DEE8CE /* PKStopDownloadButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKStopDownloadButton.h; sourceTree = "<group>"; };
+		B6F9CA6E1CFC527000DEE8CE /* PKStopDownloadButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PKStopDownloadButton.m; sourceTree = "<group>"; };
+		B6F9CA6F1CFC527000DEE8CE /* UIImage+PKDownloadButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PKDownloadButton.h"; sourceTree = "<group>"; };
+		B6F9CA701CFC527000DEE8CE /* UIImage+PKDownloadButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PKDownloadButton.m"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1C5B34201CF69F9C00271B7C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1C5B342D1CF69FBE00271B7C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1C5B348E1CF6D56600271B7C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C5B34A81CF6D57100271B7C /* libUOneMedia.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1C5B33F31CF69E2800271B7C = {
+			isa = PBXGroup;
+			children = (
+				B61D57981CFEC21700EE66F0 /* CoreGraphics.framework */,
+				B61D57961CFEC1B200EE66F0 /* Foundation.framework */,
+				B61D57931CFEC14600EE66F0 /* UIKit.framework */,
+				1C5B34241CF69F9C00271B7C /* UOneMediaStaticLib */,
+				1C5B34311CF69FBE00271B7C /* UOneMediaBundle */,
+				1C5B34921CF6D56600271B7C /* UOneMediaApp */,
+				1C5B33FD1CF69E2800271B7C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1C5B33FD1CF69E2800271B7C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34231CF69F9C00271B7C /* libUOneMedia.a */,
+				1C5B34301CF69FBE00271B7C /* UOneMedia.bundle */,
+				1C5B34911CF6D56600271B7C /* UOneMediaApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1C5B34241CF69F9C00271B7C /* UOneMediaStaticLib */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34361CF6A1A700271B7C /* Class */,
+				1C5B344C1CF6A1A700271B7C /* UOneMedia.h */,
+				1C5B34B61CF7096700271B7C /* UOneMedia.m */,
+				1C5B34AE1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch */,
+			);
+			path = UOneMediaStaticLib;
+			sourceTree = "<group>";
+		};
+		1C5B34311CF69FBE00271B7C /* UOneMediaBundle */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34B41CF7049F00271B7C /* Images.xcassets */,
+				1C5B34321CF69FBE00271B7C /* Info.plist */,
+			);
+			path = UOneMediaBundle;
+			sourceTree = "<group>";
+		};
+		1C5B34361CF6A1A700271B7C /* Class */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34371CF6A1A700271B7C /* DownloadManager */,
+				1C5B34421CF6A1A700271B7C /* ThirdParty */,
+				1C5B34AA1CF6D6DE00271B7C /* NSBundle+WspxUtility.h */,
+				1C5B34AB1CF6D6DE00271B7C /* NSBundle+WspxUtility.m */,
+			);
+			path = Class;
+			sourceTree = "<group>";
+		};
+		1C5B34371CF6A1A700271B7C /* DownloadManager */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34381CF6A1A700271B7C /* WspxDownloadItem.h */,
+				1C5B34391CF6A1A700271B7C /* WspxDownloadItem.m */,
+				1C5B343A1CF6A1A700271B7C /* WspxDownloadManager.h */,
+				1C5B343B1CF6A1A700271B7C /* WspxDownloadManager.m */,
+				1C5B345F1CF6A2E900271B7C /* UOneDownloadTableViewCell.h */,
+				1C5B34601CF6A2E900271B7C /* UOneDownloadTableViewCell.m */,
+				1C5B34611CF6A2E900271B7C /* UOneDownloadTableViewCell.xib */,
+				1C5B34641CF6A30400271B7C /* UOneDownloadViewController.h */,
+				1C5B34651CF6A30400271B7C /* UOneDownloadViewController.m */,
+				B63474A91D057A73001B3B20 /* UoneDownloadToolbar.h */,
+				B63474AA1D057A73001B3B20 /* UoneDownloadToolbar.m */,
+			);
+			path = DownloadManager;
+			sourceTree = "<group>";
+		};
+		1C5B34421CF6A1A700271B7C /* ThirdParty */ = {
+			isa = PBXGroup;
+			children = (
+				B63474E71D059B9B001B3B20 /* SWTableViewCell */,
+				B6F9CA591CFC527000DEE8CE /* PKDownloadButton */,
+				1C5B34431CF6A1A700271B7C /* HWIFileDownload */,
+			);
+			path = ThirdParty;
+			sourceTree = "<group>";
+		};
+		1C5B34431CF6A1A700271B7C /* HWIFileDownload */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34441CF6A1A700271B7C /* HWIBackgroundSessionCompletionHandlerBlock.h */,
+				1C5B34451CF6A1A700271B7C /* HWIFileDownloadDelegate.h */,
+				1C5B34461CF6A1A700271B7C /* HWIFileDownloader.h */,
+				1C5B34471CF6A1A700271B7C /* HWIFileDownloader.m */,
+				1C5B34481CF6A1A700271B7C /* HWIFileDownloadItem.h */,
+				1C5B34491CF6A1A700271B7C /* HWIFileDownloadItem.m */,
+				1C5B344A1CF6A1A700271B7C /* HWIFileDownloadProgress.h */,
+				1C5B344B1CF6A1A700271B7C /* HWIFileDownloadProgress.m */,
+			);
+			path = HWIFileDownload;
+			sourceTree = "<group>";
+		};
+		1C5B34921CF6D56600271B7C /* UOneMediaApp */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34961CF6D56600271B7C /* AppDelegate.h */,
+				1C5B34971CF6D56600271B7C /* AppDelegate.m */,
+				1C5B34991CF6D56600271B7C /* ViewController.h */,
+				1C5B349A1CF6D56600271B7C /* ViewController.m */,
+				1C5B349C1CF6D56600271B7C /* Main.storyboard */,
+				1C5B349F1CF6D56600271B7C /* Assets.xcassets */,
+				1C5B34A11CF6D56600271B7C /* LaunchScreen.storyboard */,
+				1C5B34A41CF6D56600271B7C /* Info.plist */,
+				1C5B34931CF6D56600271B7C /* Supporting Files */,
+			);
+			path = UOneMediaApp;
+			sourceTree = "<group>";
+		};
+		1C5B34931CF6D56600271B7C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1C5B34941CF6D56600271B7C /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B63474E71D059B9B001B3B20 /* SWTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				B63474E81D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.h */,
+				B63474E91D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m */,
+				B63474EA1D059B9B001B3B20 /* SWCellScrollView.h */,
+				B63474EB1D059B9B001B3B20 /* SWCellScrollView.m */,
+				B63474EC1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h */,
+				B63474ED1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m */,
+				B63474EE1D059B9B001B3B20 /* SWTableViewCell.h */,
+				B63474EF1D059B9B001B3B20 /* SWTableViewCell.m */,
+				B63474F01D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.h */,
+				B63474F11D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m */,
+				B63474F21D059B9B001B3B20 /* SWUtilityButtonView.h */,
+				B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */,
+			);
+			path = SWTableViewCell;
+			sourceTree = "<group>";
+		};
+		B6F9CA591CFC527000DEE8CE /* PKDownloadButton */ = {
+			isa = PBXGroup;
+			children = (
+				B6F9CA5A1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h */,
+				B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */,
+				B6F9CA5C1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.h */,
+				B6F9CA5D1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m */,
+				B6F9CA5E1CFC527000DEE8CE /* PKBorderedButton.h */,
+				B6F9CA5F1CFC527000DEE8CE /* PKBorderedButton.m */,
+				B6F9CA601CFC527000DEE8CE /* PKCircleProgressView.h */,
+				B6F9CA611CFC527000DEE8CE /* PKCircleProgressView.m */,
+				B6F9CA621CFC527000DEE8CE /* PKCircleView.h */,
+				B6F9CA631CFC527000DEE8CE /* PKCircleView.m */,
+				B6F9CA641CFC527000DEE8CE /* PKDownloadButton.h */,
+				B6F9CA651CFC527000DEE8CE /* PKDownloadButton.m */,
+				B6F9CA661CFC527000DEE8CE /* PKDownloadingButton.h */,
+				B6F9CA671CFC527000DEE8CE /* PKDownloadingButton.m */,
+				B6F9CA681CFC527000DEE8CE /* PKMacros.h */,
+				B6F9CA691CFC527000DEE8CE /* PKPauseDownloadButton.h */,
+				B6F9CA6A1CFC527000DEE8CE /* PKPauseDownloadButton.m */,
+				B6F9CA6B1CFC527000DEE8CE /* PKPendingView.h */,
+				B6F9CA6C1CFC527000DEE8CE /* PKPendingView.m */,
+				B6F9CA6D1CFC527000DEE8CE /* PKStopDownloadButton.h */,
+				B6F9CA6E1CFC527000DEE8CE /* PKStopDownloadButton.m */,
+				B6F9CA6F1CFC527000DEE8CE /* UIImage+PKDownloadButton.h */,
+				B6F9CA701CFC527000DEE8CE /* UIImage+PKDownloadButton.m */,
+			);
+			path = PKDownloadButton;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		1C5B34541CF6A28400271B7C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C5B345E1CF6A29C00271B7C /* UOneMedia.h in Headers */,
+				1C5B34671CF6A30400271B7C /* UOneDownloadViewController.h in Headers */,
+				1C5B34621CF6A2E900271B7C /* UOneDownloadTableViewCell.h in Headers */,
+				B6F9CA711CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h in Headers */,
+				B6F9CA8E1CFC527000DEE8CE /* PKPauseDownloadButton.h in Headers */,
+				B6F9CA7D1CFC527000DEE8CE /* PKCircleProgressView.h in Headers */,
+				B6F9CA811CFC527000DEE8CE /* PKCircleView.h in Headers */,
+				B6F9CA891CFC527000DEE8CE /* PKDownloadingButton.h in Headers */,
+				B6F9CA921CFC527000DEE8CE /* PKPendingView.h in Headers */,
+				B6F9CA791CFC527000DEE8CE /* PKBorderedButton.h in Headers */,
+				B6F9CA8D1CFC527000DEE8CE /* PKMacros.h in Headers */,
+				B6F9CA9A1CFC527000DEE8CE /* UIImage+PKDownloadButton.h in Headers */,
+				B6F9CA961CFC527000DEE8CE /* PKStopDownloadButton.h in Headers */,
+				B6F9CA751CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.h in Headers */,
+				1C5B34551CF6A29200271B7C /* WspxDownloadItem.h in Headers */,
+				B63474F71D059B9B001B3B20 /* SWCellScrollView.h in Headers */,
+				1C5B34561CF6A29200271B7C /* WspxDownloadManager.h in Headers */,
+				B63475001D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.h in Headers */,
+				B63475031D059B9B001B3B20 /* SWUtilityButtonView.h in Headers */,
+				B63474F41D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.h in Headers */,
+				B63474FD1D059B9B001B3B20 /* SWTableViewCell.h in Headers */,
+				B63474FA1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h in Headers */,
+				B63474AB1D057A73001B3B20 /* UoneDownloadToolbar.h in Headers */,
+				1C5B34AF1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch in Headers */,
+				1C5B34591CF6A29C00271B7C /* HWIBackgroundSessionCompletionHandlerBlock.h in Headers */,
+				1C5B345A1CF6A29C00271B7C /* HWIFileDownloadDelegate.h in Headers */,
+				1C5B345B1CF6A29C00271B7C /* HWIFileDownloader.h in Headers */,
+				1C5B345C1CF6A29C00271B7C /* HWIFileDownloadItem.h in Headers */,
+				1C5B345D1CF6A29C00271B7C /* HWIFileDownloadProgress.h in Headers */,
+				1C5B34AC1CF6D6DE00271B7C /* NSBundle+WspxUtility.h in Headers */,
+				B61D579B1CFEEF0200EE66F0 /* PKDownloadButton.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		1C5B34221CF69F9C00271B7C /* UOneMediaStaticLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1C5B34291CF69F9C00271B7C /* Build configuration list for PBXNativeTarget "UOneMediaStaticLib" */;
+			buildPhases = (
+				1C5B341F1CF69F9C00271B7C /* Sources */,
+				1C5B34201CF69F9C00271B7C /* Frameworks */,
+				1C5B34211CF69F9C00271B7C /* CopyFiles */,
+				1C5B34541CF6A28400271B7C /* Headers */,
+				1C5B34691CF6A35800271B7C /* Build UOneMediaBundle */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UOneMediaStaticLib;
+			productName = UOneMediaStaticLib;
+			productReference = 1C5B34231CF69F9C00271B7C /* libUOneMedia.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		1C5B342F1CF69FBE00271B7C /* UOneMediaBundle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1C5B34331CF69FBE00271B7C /* Build configuration list for PBXNativeTarget "UOneMediaBundle" */;
+			buildPhases = (
+				1C5B346A1CF6C47C00271B7C /* Compile Nib */,
+				1C5B342C1CF69FBE00271B7C /* Sources */,
+				1C5B342D1CF69FBE00271B7C /* Frameworks */,
+				1C5B342E1CF69FBE00271B7C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UOneMediaBundle;
+			productName = UOneMediaBundle;
+			productReference = 1C5B34301CF69FBE00271B7C /* UOneMedia.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+		1C5B34901CF6D56600271B7C /* UOneMediaApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1C5B34A71CF6D56600271B7C /* Build configuration list for PBXNativeTarget "UOneMediaApp" */;
+			buildPhases = (
+				1C5B348D1CF6D56600271B7C /* Sources */,
+				1C5B348E1CF6D56600271B7C /* Frameworks */,
+				1C5B348F1CF6D56600271B7C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UOneMediaApp;
+			productName = UOneMediaApp;
+			productReference = 1C5B34911CF6D56600271B7C /* UOneMediaApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1C5B33F41CF69E2800271B7C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = chiannetcenter;
+				TargetAttributes = {
+					1C5B34221CF69F9C00271B7C = {
+						CreatedOnToolsVersion = 7.3;
+					};
+					1C5B342F1CF69FBE00271B7C = {
+						CreatedOnToolsVersion = 7.3;
+					};
+					1C5B34901CF6D56600271B7C = {
+						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 8D983AWF36;
+					};
+				};
+			};
+			buildConfigurationList = 1C5B33F71CF69E2800271B7C /* Build configuration list for PBXProject "UOneMedia" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1C5B33F31CF69E2800271B7C;
+			productRefGroup = 1C5B33FD1CF69E2800271B7C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1C5B34221CF69F9C00271B7C /* UOneMediaStaticLib */,
+				1C5B342F1CF69FBE00271B7C /* UOneMediaBundle */,
+				1C5B34901CF6D56600271B7C /* UOneMediaApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1C5B342E1CF69FBE00271B7C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C5B34B51CF7049F00271B7C /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1C5B348F1CF6D56600271B7C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C5B34A91CF6D57C00271B7C /* UOneMedia.bundle in Resources */,
+				1C5B34A31CF6D56600271B7C /* LaunchScreen.storyboard in Resources */,
+				1C5B34A01CF6D56600271B7C /* Assets.xcassets in Resources */,
+				1C5B349E1CF6D56600271B7C /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1C5B34691CF6A35800271B7C /* Build UOneMediaBundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build UOneMediaBundle";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\nSF_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\necho \"Could not find platform name from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\nSF_SDK_VERSION=${BASH_REMATCH[1]}\nelse\necho \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\n\n\n# Build the other platform.\nxcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"UOneMediaBundle\" -configuration \"${CONFIGURATION}\" -sdk ${SF_SDK_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" OBJROOT=\"${OBJROOT}\" BUILD_ROOT=\"${BUILD_ROOT}\" SYMROOT=\"${SYMROOT}\" $ACTION\n\n\necho \"xcodebuild -project ${PROJECT_FILE_PATH} -target \\\"UOneMediaBundle\\\" -configuration ${CONFIGURATION} -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=${BUILD_DIR} OBJROOT=${OBJROOT} BUILD_ROOT=${BUILD_ROOT} SYMROOT=${SYMROOT} $ACTION\"\n";
+		};
+		1C5B346A1CF6C47C00271B7C /* Compile Nib */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Compile Nib";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exit 0\nNIB_FILES=`find ${PROJECT_DIR} -name \"*.nib\"`\n\nfor NIB_FILE in $NIB_FILES\ndo\n    rm $NIB_FILE\ndone\n\n\nXIB_FILES=`find ${PROJECT_DIR} -name \"*.xib\"`\nfor XIB_FILE in $XIB_FILES\ndo\nFILENAME=`basename $XIB_FILE`\nFILENAME=\"${FILENAME%.*}\"\nNIB_FILE=\"${PROJECT_DIR}/${TARGET_NAME}/${FILENAME}.nib\"\nibtool --errors --warnings --output-format human-readable-text --compile ${NIB_FILE} ${XIB_FILE}\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1C5B341F1CF69F9C00271B7C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C5B344D1CF6A1A700271B7C /* WspxDownloadItem.m in Sources */,
+				1C5B34B71CF7096700271B7C /* UOneMedia.m in Sources */,
+				1C5B34531CF6A1A700271B7C /* HWIFileDownloadProgress.m in Sources */,
+				B6F9CA7A1CFC527000DEE8CE /* PKBorderedButton.m in Sources */,
+				1C5B34681CF6A30400271B7C /* UOneDownloadViewController.m in Sources */,
+				B6F9CA931CFC527000DEE8CE /* PKPendingView.m in Sources */,
+				B63475011D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
+				B6F9CA821CFC527000DEE8CE /* PKCircleView.m in Sources */,
+				1C5B34631CF6A2E900271B7C /* UOneDownloadTableViewCell.m in Sources */,
+				B6F9CA9B1CFC527000DEE8CE /* UIImage+PKDownloadButton.m in Sources */,
+				B6F9CA721CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */,
+				1C5B34521CF6A1A700271B7C /* HWIFileDownloadItem.m in Sources */,
+				B6F9CA971CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */,
+				1C5B34AD1CF6D6DE00271B7C /* NSBundle+WspxUtility.m in Sources */,
+				B63474F81D059B9B001B3B20 /* SWCellScrollView.m in Sources */,
+				1C5B34511CF6A1A700271B7C /* HWIFileDownloader.m in Sources */,
+				B63474F51D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m in Sources */,
+				B6F9CA761CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m in Sources */,
+				B6F9CA8F1CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */,
+				B6F9CA861CFC527000DEE8CE /* PKDownloadButton.m in Sources */,
+				B6F9CA8A1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */,
+				B63474AC1D057A73001B3B20 /* UoneDownloadToolbar.m in Sources */,
+				B63475041D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */,
+				B63474FE1D059B9B001B3B20 /* SWTableViewCell.m in Sources */,
+				B6F9CA7E1CFC527000DEE8CE /* PKCircleProgressView.m in Sources */,
+				1C5B344E1CF6A1A700271B7C /* WspxDownloadManager.m in Sources */,
+				B63474FB1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1C5B342C1CF69FBE00271B7C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6F9CA7F1CFC527000DEE8CE /* PKCircleProgressView.m in Sources */,
+				1C5B346B1CF6CBFB00271B7C /* UOneDownloadTableViewCell.xib in Sources */,
+				B6F9CA771CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m in Sources */,
+				B6F9CA981CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */,
+				B6F9CA941CFC527000DEE8CE /* PKPendingView.m in Sources */,
+				B6F9CA831CFC527000DEE8CE /* PKCircleView.m in Sources */,
+				B6F9CA731CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */,
+				B6F9CA8B1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */,
+				B6F9CA9C1CFC527000DEE8CE /* UIImage+PKDownloadButton.m in Sources */,
+				B6F9CA901CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */,
+				B6F9CA7B1CFC527000DEE8CE /* PKBorderedButton.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1C5B348D1CF6D56600271B7C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C5B349B1CF6D56600271B7C /* ViewController.m in Sources */,
+				B63474F91D059B9B001B3B20 /* SWCellScrollView.m in Sources */,
+				B6F9CA911CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */,
+				B6F9CA991CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */,
+				B6F9CA841CFC527000DEE8CE /* PKCircleView.m in Sources */,
+				B6F9CA9D1CFC527000DEE8CE /* UIImage+PKDownloadButton.m in Sources */,
+				B63475021D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
+				B6F9CA741CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */,
+				B6F9CA951CFC527000DEE8CE /* PKPendingView.m in Sources */,
+				B6F9CA781CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.m in Sources */,
+				B63474FC1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m in Sources */,
+				B6F9CA801CFC527000DEE8CE /* PKCircleProgressView.m in Sources */,
+				B63474FF1D059B9B001B3B20 /* SWTableViewCell.m in Sources */,
+				B6F9CA7C1CFC527000DEE8CE /* PKBorderedButton.m in Sources */,
+				1C5B34981CF6D56600271B7C /* AppDelegate.m in Sources */,
+				B63474F61D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m in Sources */,
+				1C5B34951CF6D56600271B7C /* main.m in Sources */,
+				B63475051D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */,
+				B6F42C101D00155C0018D694 /* PKDownloadButton.m in Sources */,
+				B6F9CA8C1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		1C5B349C1CF6D56600271B7C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1C5B349D1CF6D56600271B7C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		1C5B34A11CF6D56600271B7C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1C5B34A21CF6D56600271B7C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1C5B34001CF69E2800271B7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1C5B34011CF69E2800271B7C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		1C5B342A1CF69F9C00271B7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				ENABLE_BITCODE = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = UOneMediaStaticLib/UOneMediaStaticLib_Prefix.pch;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRIVATE_HEADERS_FOLDER_PATH = include/private;
+				PRODUCT_NAME = UOneMedia;
+				PUBLIC_HEADERS_FOLDER_PATH = include/public;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 armv7 x86_64 i386";
+			};
+			name = Debug;
+		};
+		1C5B342B1CF69F9C00271B7C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				ENABLE_BITCODE = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = UOneMediaStaticLib/UOneMediaStaticLib_Prefix.pch;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRIVATE_HEADERS_FOLDER_PATH = include/private;
+				PRODUCT_NAME = UOneMedia;
+				PUBLIC_HEADERS_FOLDER_PATH = include/public;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 armv7 x86_64 i386";
+			};
+			name = Release;
+		};
+		1C5B34341CF69FBE00271B7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = NO;
+				INFOPLIST_FILE = UOneMediaBundle/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chinanetcenter.UOneMediaBundle;
+				PRODUCT_NAME = UOneMedia;
+				SDKROOT = iphoneos9.3;
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 armv7 x86_64 i386";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		1C5B34351CF69FBE00271B7C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = NO;
+				INFOPLIST_FILE = UOneMediaBundle/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chinanetcenter.UOneMediaBundle;
+				PRODUCT_NAME = UOneMedia;
+				SDKROOT = iphoneos9.3;
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 armv7 x86_64 i386";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		1C5B34A51CF6D56600271B7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = UOneMediaApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chinanetcenter.UOneMediaApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1C5B34A61CF6D56600271B7C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = UOneMediaApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chinanetcenter.UOneMediaApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1C5B33F71CF69E2800271B7C /* Build configuration list for PBXProject "UOneMedia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C5B34001CF69E2800271B7C /* Debug */,
+				1C5B34011CF69E2800271B7C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1C5B34291CF69F9C00271B7C /* Build configuration list for PBXNativeTarget "UOneMediaStaticLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C5B342A1CF69F9C00271B7C /* Debug */,
+				1C5B342B1CF69F9C00271B7C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1C5B34331CF69FBE00271B7C /* Build configuration list for PBXNativeTarget "UOneMediaBundle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C5B34341CF69FBE00271B7C /* Debug */,
+				1C5B34351CF69FBE00271B7C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1C5B34A71CF6D56600271B7C /* Build configuration list for PBXNativeTarget "UOneMediaApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C5B34A51CF6D56600271B7C /* Debug */,
+				1C5B34A61CF6D56600271B7C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1C5B33F41CF69E2800271B7C /* Project object */;
+}
