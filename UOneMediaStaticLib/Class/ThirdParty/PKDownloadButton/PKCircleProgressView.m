@@ -88,11 +88,10 @@ static PKCircleProgressView *CommonInit(PKCircleProgressView *self) {
     self.filledLineCircleWidth.constant = filledLineCircleSize;
     self.filledLineCircleHeight.constant = filledLineCircleSize;
 }
-
-- (void)setProgress:(CGFloat)progress {
-    _progress = progress;
+- (void)setPkProgress:(CGFloat)pkProgress {
+    _pkProgress = pkProgress;
     self.filledLineCircleView.startAngleRadians = self.startAngle;
-    self.filledLineCircleView.endAngleRadians = (self.endAngle - self.startAngle) * progress + self.startAngle;
+    self.filledLineCircleView.endAngleRadians = (self.endAngle - self.startAngle) * pkProgress + self.startAngle;
     
     [self setNeedsDisplay];
 }

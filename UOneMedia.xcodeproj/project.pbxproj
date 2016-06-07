@@ -38,6 +38,12 @@
 		1C5B34AF1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 1C5B34AE1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch */; };
 		1C5B34B51CF7049F00271B7C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C5B34B41CF7049F00271B7C /* Images.xcassets */; };
 		1C5B34B71CF7096700271B7C /* UOneMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B34B61CF7096700271B7C /* UOneMedia.m */; };
+		B60CDDF81D066A7E00323C01 /* UIAlertView+WSPXUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = B60CDDF41D066A7E00323C01 /* UIAlertView+WSPXUtility.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B60CDDF91D066A7E00323C01 /* UIAlertView+WSPXUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = B60CDDF51D066A7E00323C01 /* UIAlertView+WSPXUtility.m */; };
+		B60CDDFA1D066A7E00323C01 /* UIAlertView+WSPXUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = B60CDDF51D066A7E00323C01 /* UIAlertView+WSPXUtility.m */; };
+		B60CDDFB1D066A7E00323C01 /* WSPXAlertManager.h in Headers */ = {isa = PBXBuildFile; fileRef = B60CDDF61D066A7E00323C01 /* WSPXAlertManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B60CDDFC1D066A7E00323C01 /* WSPXAlertManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B60CDDF71D066A7E00323C01 /* WSPXAlertManager.m */; };
+		B60CDDFD1D066A7E00323C01 /* WSPXAlertManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B60CDDF71D066A7E00323C01 /* WSPXAlertManager.m */; };
 		B61D579B1CFEEF0200EE66F0 /* PKDownloadButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA641CFC527000DEE8CE /* PKDownloadButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B63474AB1D057A73001B3B20 /* UoneDownloadToolbar.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474A91D057A73001B3B20 /* UoneDownloadToolbar.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B63474AC1D057A73001B3B20 /* UoneDownloadToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474AA1D057A73001B3B20 /* UoneDownloadToolbar.m */; };
@@ -153,6 +159,10 @@
 		1C5B34AE1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UOneMediaStaticLib_Prefix.pch; sourceTree = "<group>"; };
 		1C5B34B41CF7049F00271B7C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1C5B34B61CF7096700271B7C /* UOneMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UOneMedia.m; path = UOneMediaStaticLib/UOneMedia.m; sourceTree = SOURCE_ROOT; };
+		B60CDDF41D066A7E00323C01 /* UIAlertView+WSPXUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+WSPXUtility.h"; sourceTree = "<group>"; };
+		B60CDDF51D066A7E00323C01 /* UIAlertView+WSPXUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+WSPXUtility.m"; sourceTree = "<group>"; };
+		B60CDDF61D066A7E00323C01 /* WSPXAlertManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSPXAlertManager.h; sourceTree = "<group>"; };
+		B60CDDF71D066A7E00323C01 /* WSPXAlertManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WSPXAlertManager.m; sourceTree = "<group>"; };
 		B61D57931CFEC14600EE66F0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		B61D57961CFEC1B200EE66F0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		B61D57981CFEC21700EE66F0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
@@ -296,6 +306,7 @@
 		1C5B34421CF6A1A700271B7C /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				B60CDDF31D066A7E00323C01 /* AlertView */,
 				B63474E71D059B9B001B3B20 /* SWTableViewCell */,
 				B6F9CA591CFC527000DEE8CE /* PKDownloadButton */,
 				1C5B34431CF6A1A700271B7C /* HWIFileDownload */,
@@ -340,6 +351,17 @@
 				1C5B34941CF6D56600271B7C /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B60CDDF31D066A7E00323C01 /* AlertView */ = {
+			isa = PBXGroup;
+			children = (
+				B60CDDF41D066A7E00323C01 /* UIAlertView+WSPXUtility.h */,
+				B60CDDF51D066A7E00323C01 /* UIAlertView+WSPXUtility.m */,
+				B60CDDF61D066A7E00323C01 /* WSPXAlertManager.h */,
+				B60CDDF71D066A7E00323C01 /* WSPXAlertManager.m */,
+			);
+			path = AlertView;
 			sourceTree = "<group>";
 		};
 		B63474E71D059B9B001B3B20 /* SWTableViewCell */ = {
@@ -420,6 +442,8 @@
 				B63474F41D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.h in Headers */,
 				B63474FD1D059B9B001B3B20 /* SWTableViewCell.h in Headers */,
 				B63474FA1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h in Headers */,
+				B60CDDFB1D066A7E00323C01 /* WSPXAlertManager.h in Headers */,
+				B60CDDF81D066A7E00323C01 /* UIAlertView+WSPXUtility.h in Headers */,
 				B63474AB1D057A73001B3B20 /* UoneDownloadToolbar.h in Headers */,
 				1C5B34AF1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch in Headers */,
 				1C5B34591CF6A29C00271B7C /* HWIBackgroundSessionCompletionHandlerBlock.h in Headers */,
@@ -610,9 +634,11 @@
 				B6F9CA861CFC527000DEE8CE /* PKDownloadButton.m in Sources */,
 				B6F9CA8A1CFC527000DEE8CE /* PKDownloadingButton.m in Sources */,
 				B63474AC1D057A73001B3B20 /* UoneDownloadToolbar.m in Sources */,
+				B60CDDF91D066A7E00323C01 /* UIAlertView+WSPXUtility.m in Sources */,
 				B63475041D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */,
 				B63474FE1D059B9B001B3B20 /* SWTableViewCell.m in Sources */,
 				B6F9CA7E1CFC527000DEE8CE /* PKCircleProgressView.m in Sources */,
+				B60CDDFC1D066A7E00323C01 /* WSPXAlertManager.m in Sources */,
 				1C5B344E1CF6A1A700271B7C /* WspxDownloadManager.m in Sources */,
 				B63474FB1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m in Sources */,
 			);
@@ -641,6 +667,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1C5B349B1CF6D56600271B7C /* ViewController.m in Sources */,
+				B60CDDFA1D066A7E00323C01 /* UIAlertView+WSPXUtility.m in Sources */,
 				B63474F91D059B9B001B3B20 /* SWCellScrollView.m in Sources */,
 				B6F9CA911CFC527000DEE8CE /* PKPauseDownloadButton.m in Sources */,
 				B6F9CA991CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */,
@@ -653,6 +680,7 @@
 				B63474FC1D059B9B001B3B20 /* SWLongPressGestureRecognizer.m in Sources */,
 				B6F9CA801CFC527000DEE8CE /* PKCircleProgressView.m in Sources */,
 				B63474FF1D059B9B001B3B20 /* SWTableViewCell.m in Sources */,
+				B60CDDFD1D066A7E00323C01 /* WSPXAlertManager.m in Sources */,
 				B6F9CA7C1CFC527000DEE8CE /* PKBorderedButton.m in Sources */,
 				1C5B34981CF6D56600271B7C /* AppDelegate.m in Sources */,
 				B63474F61D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m in Sources */,
@@ -856,6 +884,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chinanetcenter.UOneMediaApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8cd75817-cf79-4612-bda9-f527d13e8193";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -874,6 +903,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chinanetcenter.UOneMediaApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8cd75817-cf79-4612-bda9-f527d13e8193";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;

@@ -75,7 +75,7 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
     switch (state) {
         case kPKDownloadButtonState_StartDownload:
             self.startDownloadButton.hidden = NO;
-            self.downloadingButton.progress = 0.f;
+            self.downloadingButton.pkProgress = 0.f;
             NSLog(@"download state: StartDownLaod");
             break;
         case kPKDownloadButtonState_Pending:

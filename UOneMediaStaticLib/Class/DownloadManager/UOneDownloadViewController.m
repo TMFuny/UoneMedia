@@ -14,6 +14,7 @@
 #import <QuickLook/QuickLook.h>
 #import "NSBundle+WspxUtility.h"
 #import "UoneDownloadToolbar.h"
+#import "WSPXAlertManager.h"
 
 @interface UOneDownloadViewController ()<QLPreviewControllerDataSource,
 QLPreviewControllerDelegate,
@@ -28,8 +29,10 @@ UOneDownloadTableViewCellDelegate>
 {
     NSBundle* _bundle;
     NSMutableIndexSet* _selectedIndexSet;
+    UIView* _blankView;
+    WSPXAlertManager* _alertManager;
+    NSMutableArray* _downloadList;
 }
-
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -37,6 +40,7 @@ UOneDownloadTableViewCellDelegate>
     }
     return self;
 }
+#pragma mark - ViewLifeCycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -46,14 +50,38 @@ UOneDownloadTableViewCellDelegate>
     
     self.downloadManager = [WspxDownloadManager shareInstance];
     _selectedIndexSet = [NSMutableIndexSet indexSet];
+    _downloadList = [[NSMutableArray alloc] init];
+    [self refreshDownloadList];
+    
     if (!self.tableView) {
         NSLog(@"self.view.frame: %@", NSStringFromCGRect(self.view.frame));
         self.tableView = [[UITableView alloc]initWithFrame:self.view.frame style:UITableViewStylePlain];
         [self.view addSubview:self.tableView];
     }
+    
+    //创建 BlankView 背景
+    _blankView = [[UIView alloc] initWithFrame:_tableView.bounds];
+    UIImageView *emptyImageView1 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bookmark_empty"]];
+    emptyImageView1.frame = CGRectMake(0, 80, kScreenWidth, 100);
+    emptyImageView1.contentMode = UIViewContentModeScaleAspectFit;
+    
+    UILabel *tip1 = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(emptyImageView1.frame) + 20, kScreenWidth, 40)];
+    tip1.text = @"还木有收藏书签哦~";
+    tip1.textAlignment = NSTextAlignmentCenter;
+    tip1.textColor = UIColorFromHex(0xb9b9b9);
+    
+    [_blankView addSubview:emptyImageView1];
+    [_blankView addSubview:tip1];
+    _blankView.backgroundColor = [UIColor clearColor];
+    _blankView.hidden = YES;
+    [_tableView addSubview:_blankView];
+    
     if (!self.fileManagerToolbar) {
         self.fileManagerToolbar = [[UoneDownloadToolbar alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 47, self.view.frame.size.width, 47)];
         self.fileManagerToolbar.customedDelegate = self;
+        if (_downloadList && [_downloadList count] != 0) {
+            self.fileManagerToolbar.isLabelMode = NO;
+        }
         [self.view addSubview:self.fileManagerToolbar];
     }
     
@@ -83,133 +111,48 @@ UOneDownloadTableViewCellDelegate>
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-#pragma mark UIDocumentInteractionControllerDelegate
-- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller {
-    if (self.navigationController) {
-        return self.navigationController;
-    } else {
-        return self;
-    }
-}
-#pragma mark QLPreviewControllerDataSource
-
-- (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
-
-    return 1;
-}
-- (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    NSURL *fileURL = nil;
-    NSIndexPath *selectedIndexPath = [self.tableView indexPathForSelectedRow];
-    WspxDownloadItem *item = self.downloadManager.downloadItems[selectedIndexPath.row];
-    fileURL = item.localFileURL;
-    return fileURL;
-}
-
-#pragma mark - WspxDownloadManager Notification
-
-- (void)registerNotification {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidComplete:) name:wspxDownloadDidCompleteNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onProgressDidChange:) name:wspxDownloadProgressChangedNotification object:nil];
-    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
-    {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTotalProgressDidChange:) name:wspxTotalDownloadProgressChangedNotification object:nil];
-    }
-    return;
-}
-
-- (void)unregisterNotification {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidCompleteNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadProgressChangedNotification object:nil];
-    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
-    {
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxTotalDownloadProgressChangedNotification object:nil];
-    }
-    return;
-}
-
-- (void)onDownloadDidComplete:(NSNotification *)aNotification {
-    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object; ////////
-    NSLog(@"onDownloadDidComplete --> %@", aDownloadedItem);
-    NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
-        if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier])
-        {
-            return YES;
-        }
-        return NO;
-    }];
+#pragma mark - UIInit
+#pragma mark - UIConfig
+#pragma mark - UIUpdate
+- (void)updateToolbarInterface {
+    NSMutableArray *list = _downloadList;
     
-    if (aFoundDownloadItemIndex != NSNotFound)
-    {
-        NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
-         if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
-             UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
-             [cell resetWithDownloadItem:aDownloadedItem];
-        }
-    }
-    else
-    {
-        NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
-    }
-}
-
-- (void)onProgressDidChange:(NSNotification *)aNotification {
-    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
-    NSLog(@"onProgressDidChange --> %@", aDownloadedItem);
-    
-    NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
-        if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
-            return YES;
-        }
-        return NO;
-    }];
-    
-    if (aFoundDownloadItemIndex != NSNotFound) {
-        NSTimeInterval lastChangedUpdateDelta = 10.0;
-        if (aDownloadedItem.lastUpdateTime)
-        {
-            lastChangedUpdateDelta = [[NSDate date] timeIntervalSinceDate:aDownloadedItem.lastUpdateTime];
-        }
-        if (lastChangedUpdateDelta > 0.25) {
-            NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
-            if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
-                UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
-                [cell resetWithDownloadItem:aDownloadedItem];
+    if (_fileManagerToolbar.isEditing) {
+        NSInteger selectedNums = [_selectedIndexSet count];
+        if (list.count != 0) {
+            [_fileManagerToolbar.selectAllButton setEnabled:YES];
+            if (selectedNums == list.count) {
+                _fileManagerToolbar.selectAllButton.selected = YES;
+            } else {
+                _fileManagerToolbar.selectAllButton.selected = NO;
             }
-            aDownloadedItem.lastUpdateTime = [NSDate date];
+        } else {
+            _fileManagerToolbar.selectAllButton.selected = NO;
+            _fileManagerToolbar.selectAllButton.enabled = NO;
         }
-    } else {
-        NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+        
+        if (list.count == 0 || selectedNums == 0) {
+            _fileManagerToolbar.deleteButton.enabled = NO;
+        } else {
+            _fileManagerToolbar.deleteButton.enabled = YES;
+        }
+        [_fileManagerToolbar setDeleteTitle:[self getDeleteString]];
     }
-}
-
-- (void)onTotalProgressDidChange:(NSNotification *)aNotification {
-    NSLog(@"onTotalProgressDidChange -->");
-}
-#pragma mark - UoneDownloadToolbarDelegate
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedEditButton:(UIButton *)button {
-    [_selectedIndexSet removeAllIndexes];
-    [self.tableView setEditing:_fileManagerToolbar.isEditing animated:YES];
-}
-
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedSelectAllButton:(UIButton *)button {
-    BOOL isSelectedAll = !button.selected;
-    NSMutableArray* list = [self.downloadManager downloadItems];
     
-    if (isSelectedAll) {
-        [_selectedIndexSet addIndexesInRange:NSMakeRange(0, (NSUInteger)[list count])];
+    if (list.count == 0) {
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        
+        _blankView.hidden = NO;
+        _fileManagerToolbar.editButton.enabled = NO;
+        _fileManagerToolbar.isLabelMode = YES;
     } else {
-        [_selectedIndexSet removeAllIndexes];
+        _fileManagerToolbar.editButton.enabled = YES;
+        _fileManagerToolbar.isLabelMode = NO;
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        _blankView.hidden = YES;
     }
-    [_tableView reloadData];
 }
-
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDeleteButton:(UIButton *)button {
-   
-}
-
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDoneButton:(UIButton *)button {
-    [self.tableView setEditing:_fileManagerToolbar.isEditing animated:YES];
-}
+#pragma mark - AppleDataSource and Delegate
 #pragma mark - UITableViewDelegate
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -227,7 +170,10 @@ UOneDownloadTableViewCellDelegate>
     return YES;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    WspxDownloadItem* item = _downloadManager.downloadItems[indexPath.row];
+    if (self.tableView.isEditing) {
+        return;
+    }
+    WspxDownloadItem* item = _downloadList[indexPath.row];
     WspxDownloadItemStatus itemStatus = item.status;
    
     switch (itemStatus) {
@@ -278,7 +224,7 @@ UOneDownloadTableViewCellDelegate>
 
 - (void)presentOptionsMenu {
     NSIndexPath *path = [self.tableView indexPathForSelectedRow];
-    WspxDownloadItem *item = self.downloadManager.downloadItems[path.row];
+    WspxDownloadItem *item = _downloadList[path.row];
     NSURL *fileURL = item.localFileURL;
     [self setupDocumentControllerWithURL:fileURL];
     self.docInteractionController.URL = fileURL;
@@ -299,7 +245,7 @@ UOneDownloadTableViewCellDelegate>
 #pragma mark UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.downloadManager.downloadItems.count;
+    return _downloadList.count;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -337,18 +283,152 @@ UOneDownloadTableViewCellDelegate>
     if ([cell isKindOfClass:[UOneDownloadTableViewCell class]]) {
         
         NSInteger row = indexPath.row;
-        WspxDownloadItem* item = _downloadManager.downloadItems[row];
+        WspxDownloadItem* item = _downloadList[row];
         
         [(UOneDownloadTableViewCell*)cell resetWithDownloadItem:item];
         
     }
 }
+
+#pragma mark UIDocumentInteractionControllerDelegate
+- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller {
+    if (self.navigationController) {
+        return self.navigationController;
+    } else {
+        return self;
+    }
+}
+#pragma mark QLPreviewControllerDataSource
+
+- (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
+    
+    return 1;
+}
+- (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
+    NSURL *fileURL = nil;
+    NSIndexPath *selectedIndexPath = [self.tableView indexPathForSelectedRow];
+    WspxDownloadItem *item = _downloadList[selectedIndexPath.row];
+    fileURL = item.localFileURL;
+    return fileURL;
+}
+#pragma mark - ThirdPartyDataSource and Delegate
+#pragma mark  SWTableViewDelegate
+- (void)swipeableTableViewCell:(SWTableViewCell *)cell scrollingToState:(SWCellState)state {
+    if (state == kCellStateCenter) {
+        
+    }
+}
+- (void)swipeableTableViewCellDidEndScrolling:(SWTableViewCell *)cell {
+    NSLog(@"didEndScrolling: tag:%d",(int)cell.tag);
+}
+
+- (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
+    NSLog(@"didTriggerRightUtilityButtonWithIndex:");
+    NSMutableArray* list = _downloadList;
+    NSIndexPath *indexPath = [_tableView indexPathForCell:cell];
+    if (indexPath && indexPath.row < [list count]) {
+        WspxDownloadItem* item = [list objectAtIndex:indexPath.row];
+        
+        [self.downloadManager removeDownloadWithItem:item];
+        
+        [list removeObject:item];
+        [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+        
+        //        [_hudManager showSuccessWithMessage:@"移除成功" duration:1];
+        //        _hudManager.HUD.minSize = CGSizeMake(100,100);
+        //        _hudManager.HUD.opacity = 0.6;
+        //        _hudManager.HUD.dimBackground = YES;
+    }
+}
+
+#pragma mark - CustomDataSource and Delegate
+#pragma mark WspxDownloadManager Notification
+
+- (void)registerNotification {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidComplete:) name:wspxDownloadDidCompleteNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onProgressDidChange:) name:wspxDownloadProgressChangedNotification object:nil];
+    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTotalProgressDidChange:) name:wspxTotalDownloadProgressChangedNotification object:nil];
+    }
+    return;
+}
+
+- (void)unregisterNotification {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidCompleteNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadProgressChangedNotification object:nil];
+    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+    {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxTotalDownloadProgressChangedNotification object:nil];
+    }
+    return;
+}
+
+- (void)onDownloadDidComplete:(NSNotification *)aNotification {
+    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
+    NSLog(@"onDownloadDidComplete --> %@", aDownloadedItem);
+    NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier])
+        {
+            return YES;
+        }
+        return NO;
+    }];
+    
+    if (aFoundDownloadItemIndex != NSNotFound)
+    {
+        NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
+        if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
+            UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
+            [cell resetWithDownloadItem:aDownloadedItem];
+        }
+    }
+    else
+    {
+        NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+}
+
+- (void)onProgressDidChange:(NSNotification *)aNotification {
+    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
+    NSLog(@"onProgressDidChange --> %@", aDownloadedItem);
+    
+    NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
+            return YES;
+        }
+        return NO;
+    }];
+    
+    if (aFoundDownloadItemIndex != NSNotFound) {
+        NSTimeInterval lastChangedUpdateDelta = 10.0;
+        if (aDownloadedItem.lastUpdateTime)
+        {
+            lastChangedUpdateDelta = [[NSDate date] timeIntervalSinceDate:aDownloadedItem.lastUpdateTime];
+        }
+        if (lastChangedUpdateDelta > 0.25) {
+            NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
+            if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
+                UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
+                [cell resetWithDownloadItem:aDownloadedItem];
+            }
+            aDownloadedItem.lastUpdateTime = [NSDate date];
+        }
+    } else {
+        NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+}
+
+- (void)onTotalProgressDidChange:(NSNotification *)aNotification {
+    NSLog(@"onTotalProgressDidChange -->");
+}
+
 #pragma mark - UOneDownloadTableViewCellDelegate
 - (void)tableViewCell:(nonnull UOneDownloadTableViewCell *)cell didClickedDownloadButton:(nonnull UIButton *)button {
     NSIndexPath * indexPath = [self.tableView indexPathForCell:cell];
     NSInteger row = indexPath.row;
-    if (row < _downloadManager.downloadItems.count) {
-        WspxDownloadItem * downloadItem = _downloadManager.downloadItems[row];
+    if (row < _downloadList.count) {
+        WspxDownloadItem * downloadItem = _downloadList[row];
         switch (downloadItem.status) {
             case WspxDownloadItemStatusNotStarted:
             case WspxDownloadItemStatusError:
@@ -373,8 +453,7 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)onSelected:(BOOL)selected tableViewCell:(UOneDownloadTableViewCell*)cell {
-    NSLog(@"selected:%d", selected);
-    NSMutableArray* list = [self.downloadManager downloadItems];
+    NSMutableArray* list = _downloadList;
     
     NSUInteger row = [_tableView indexPathForCell:cell].row;
     WspxDownloadItem *item = [list objectAtIndex:row];
@@ -385,53 +464,160 @@ UOneDownloadTableViewCellDelegate>
             [_selectedIndexSet removeIndex:(NSUInteger)row];
         }
     }
-}
-#pragma mark - SWTableViewDelegate
-- (void)swipeableTableViewCell:(SWTableViewCell *)cell scrollingToState:(SWCellState)state {
-    if (state == kCellStateCenter) {
-        
-    }
-}
-- (void)swipeableTableViewCellDidEndScrolling:(SWTableViewCell *)cell {
-    NSLog(@"didEndScrolling: tag:%d",(int)cell.tag);
+    [self updateToolbarInterface];
 }
 
-- (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
-    NSLog(@"didTriggerRightUtilityButtonWithIndex:");
-    NSMutableArray* list = [self.downloadManager downloadItems];
-    NSIndexPath *indexPath = [_tableView indexPathForCell:cell];
-    if (indexPath && indexPath.row < [list count]) {
-        WspxDownloadItem* item = [list objectAtIndex:indexPath.row];
-       
-        [self.downloadManager removeDownloadWithItem:item];
+#pragma mark - UoneDownloadToolbarDelegate
+- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedEditButton:(UIButton *)button {
+    [_selectedIndexSet removeAllIndexes];
+    [self.tableView setEditing:_fileManagerToolbar.isEditing animated:YES];
+    [self updateToolbarInterface];
+    [_fileManagerToolbar layout];
+}
+
+- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDoneButton:(UIButton *)button {
+    [self.tableView setEditing:_fileManagerToolbar.isEditing animated:YES];
+    [_selectedIndexSet removeAllIndexes];
+    [self updateToolbarInterface];
+}
+
+- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedSelectAllButton:(UIButton *)button {
+    BOOL isSelectedAll = !button.selected;
+    NSMutableArray* list = _downloadList;
     
-        [list removeObject:item];
-        [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];
-        
-//        [_hudManager showSuccessWithMessage:@"移除成功" duration:1];
-//        _hudManager.HUD.minSize = CGSizeMake(100,100);
-//        _hudManager.HUD.opacity = 0.6;
-//        _hudManager.HUD.dimBackground = YES;
+    if (isSelectedAll) {
+        [_selectedIndexSet addIndexesInRange:NSMakeRange(0, (NSUInteger)[list count])];
+    } else {
+        [_selectedIndexSet removeAllIndexes];
     }
+    [self updateToolbarInterface];
+    [_fileManagerToolbar layout];
+    [_tableView reloadData];
 }
 
+- (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDeleteButton:(UIButton *)button {
+    __weak __typeof(self) weakSelf = self;
+    [self showAlertViewWith:nil message:@"确定删除所选下载任务及其文件？" cancelTitle:@"取消" cancelAction:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf updateToolbarInterface];
+            [weakSelf.fileManagerToolbar layout];
+        });
+        NSLog(@"click cancelButton");
+    } confirmTitle:@"删除" confirmAction:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSUInteger i = 0;
+            NSMutableArray *indexPaths = [NSMutableArray new];
+            if (_selectedIndexSet != nil && [_selectedIndexSet count] > 0) {
+                for (i = [_selectedIndexSet firstIndex]; i!= NSNotFound; i = [_selectedIndexSet indexGreaterThanIndex: i]) {
+                    WspxDownloadItem *item = [_downloadList objectAtIndex:i];
+                    if (item) {
+                        [weakSelf.downloadManager removeDownloadWithItem:item];
+                    }
+                    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:i inSection:0];
+                    [indexPaths addObject:indexPath];
+                }
+                
+                [weakSelf refreshDownloadList];
+                [_selectedIndexSet removeAllIndexes];
+                [weakSelf.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationLeft];
+                [weakSelf updateToolbarInterface];
+                [weakSelf.fileManagerToolbar layout];
+            }
+        });
+        NSLog(@"click confirmButton");
+    }];
+}
+#pragma mark - Target-Action Event
+#pragma mark - PublicMethod
+#pragma mark - PrivateMethod
+
+-(void) refreshDownloadList {
+    [_downloadList removeAllObjects];
+    if (self.downloadManager.downloadItems && [self.downloadManager.downloadItems count] != 0) {
+        for (WspxDownloadItem* item in [self.downloadManager downloadItems]) {
+            [_downloadList addObject:item];
+        }
+    }
+}
+- (void)showAlertViewWith:(NSString*)title
+                  message:(NSString*)message
+              cancelTitle:(NSString*)cancelTitle
+             cancelAction:(void(^ __nullable)())cancelBlock
+             confirmTitle:(NSString*)confirmTitle
+            confirmAction:(void(^ __nullable)()) confirmBlock {
+    if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:confirmTitle
+                                                                style:UIAlertActionStyleDestructive
+                                                              handler:^(UIAlertAction * _Nonnull action) {
+                                                                  if (confirmBlock) {
+                                                                      confirmBlock();
+                                                                  }
+                                                              }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+                                                                 if (cancelBlock) {
+                                                                     cancelBlock();
+                                                                 }
+                                                             }];
+        [alertController addAction:confirmAction];
+        [alertController addAction:cancelAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+    } else {
+        _alertManager = [[WSPXAlertManager alloc] init];
+        
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:title
+                                                            message:message
+                                                           delegate:nil
+                                                  cancelButtonTitle:cancelTitle
+                                                  otherButtonTitles: confirmTitle, nil];
+        alertView.didClickedButtonHandler = ^BOOL(UIAlertView* alertView, NSInteger buttonIndex) {
+            if (buttonIndex == 1) {
+                if (confirmBlock) {
+                    confirmBlock();
+                }
+            } else {
+                if (cancelBlock) {
+                    cancelBlock();
+                }
+            }
+            return YES;
+        };
+        
+        [_alertManager push:alertView];
+    }
+}
 
 - (void)showAlertView {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
                                                                              message:@"找不到打开该文件的app"
                                                                       preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-       
+        
         
     }];
-
+    
     [alertController addAction:cancelAction];
     [self presentViewController:alertController animated:YES completion:^{
         
     }];
 }
-- (void)setupDocumentControllerWithURL:(NSURL *)url
-{
+
+- (NSString*)getDeleteString {
+    NSString *deleteString = @"删除";
+    if (_selectedIndexSet && [_selectedIndexSet count] != 0) {
+        deleteString = [NSString stringWithFormat:@"删除(%d)",[_selectedIndexSet count]];
+    }
+    return deleteString;
+}
+
+- (void)setupDocumentControllerWithURL:(NSURL *)url {
     if (self.docInteractionController == nil)
     {
         self.docInteractionController = [UIDocumentInteractionController interactionControllerWithURL:url];
@@ -442,5 +628,7 @@ UOneDownloadTableViewCellDelegate>
         self.docInteractionController.URL = url;
     }
 }
-
+- (void)setQLPreviewControllerWithURL:(NSURL *)url {
+    
+}
 @end

@@ -24,6 +24,7 @@
 
 @interface UOneDownloadTableViewCell : SWTableViewCell
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *progressViewWidthConstraint;
 @property (nullable, nonatomic, weak) IBOutlet UILabel * fileLabel;
 @property (nullable, nonatomic, weak) IBOutlet UILabel * sizeLabel;
 @property (nullable, nonatomic, weak) IBOutlet UIImageView * iconImage;

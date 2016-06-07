@@ -26,9 +26,7 @@
     [super awakeFromNib];
     _bundle = [NSBundle bundleWithURL:[[NSBundle mainBundle] URLForResource:@"UOneMedia" withExtension:@"bundle"]];
     _downloadItem = nil;
-    
     [self initFileExtImageMap];
-    
     // Initialization code
     [self.fileLabel setFont:[UIFont systemFontOfSize:15]];
     [self.sizeLabel setFont:[UIFont systemFontOfSize:13]];
@@ -102,42 +100,6 @@
         [self.downloadButton.pendingView startSpin];
     }
 }
-static NSDictionary *staticMap = nil;
-static NSDictionary *staticExtImageMap = nil;
-
-- (void)initFileExtImageMap {
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-       staticMap = [self getDoucmentTypeMap];
-       staticExtImageMap =[self getImageMap];
-    });
-}
-
-- (NSDictionary*)getDoucmentTypeMap {
-    
-    NSString *pictureString = @"jpg、jpeg、png、bmp、gif";
-    NSString *documentString = @"txt、doc、docx、ppt、pptx、xls、xlsx、pdf";
-    NSString *videoString = @"avi、rmvb、rm、asf、divx、mpg、mpeg、mpe、wmv、mp4、mkv、vob";
-    NSString *audioString = @"mp3、wma、wav";
-    NSString *zipString = @"rar、zip";
-    
-    
-    NSDictionary *map = @{@"pic": pictureString,
-                          @"doc": documentString,
-                          @"video": videoString,
-                          @"audio": audioString,
-                          @"zip": zipString};
-    return map;
-}
-
-- (NSDictionary*)getImageMap {
-    return @{@"pic" : @"图片",
-             @"doc" : @"文档",
-             @"video": @"视频",
-             @"audio": @"音乐",
-             @"zip": @"压缩" };
-}
 
 - (void)resetWithDownloadItem : ( WspxDownloadItem * _Nonnull )aDownloadItem {
     self.fileLabel.text = [self splitFilenameFromUrl:aDownloadItem.remoteURL.absoluteString];
@@ -177,8 +139,8 @@ static NSDictionary *staticExtImageMap = nil;
             [sizeString appendString:@" | "];
             [sizeString appendString:[self toStringWithBytesPerSecond:_downloadItem.bytesPerSecondSpeed]];
             self.downloadButton.state = kPKDownloadButtonState_Downloading;
-            self.downloadButton.pauseDownloadButton.progress = progress;
-            self.downloadButton.downloadingButton.progress = progress;
+            self.downloadButton.pauseDownloadButton.pkProgress = progress;
+            self.downloadButton.downloadingButton.pkProgress = progress;
             break;
         }
         case WspxDownloadItemStatusInterrupted:
@@ -186,8 +148,8 @@ static NSDictionary *staticExtImageMap = nil;
         {
             [sizeString appendString:@" | 已暂停"];
             self.downloadButton.state = kPKDownloadButtonState_Pausing;
-            self.downloadButton.pauseDownloadButton.progress = progress;
-            self.downloadButton.downloadingButton.progress = progress;
+            self.downloadButton.pauseDownloadButton.pkProgress = progress;
+            self.downloadButton.downloadingButton.pkProgress = progress;
             break;
         }
     }
@@ -209,13 +171,19 @@ static NSDictionary *staticExtImageMap = nil;
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     if (editing) {
+        _progressView.hidden = YES;
+        _progressViewWidthConstraint.constant = 0;
         [UIView animateWithDuration:0.7 animations:^{
             _checkButton.alpha = 1;
+            _progressView.alpha = 0;
         } completion:nil];
     } else {
         _checkButton.selected = NO;
+        _progressView.hidden = NO;
+        _progressViewWidthConstraint.constant = 40;
         [UIView animateWithDuration:0.7 animations:^{
             _checkButton.alpha = 0;
+            _progressView.alpha = 1;
         } completion:nil];
     }
 }
@@ -252,6 +220,8 @@ static NSDictionary *staticExtImageMap = nil;
                 currentState:(PKDownloadButtonState)state {
     [self onTapGesture:nil];
 }
+
+#pragma mark - privateMethod
 
 - (UIImage *)imageWithFileExt:(NSString*)fileExt {
     NSArray* allKeys = [staticMap allKeys];
@@ -315,6 +285,42 @@ static NSDictionary *staticExtImageMap = nil;
 
     return [attr copy];
     
+}
+static NSDictionary *staticMap = nil;
+static NSDictionary *staticExtImageMap = nil;
+
+- (void)initFileExtImageMap {
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        staticMap = [self getDoucmentTypeMap];
+        staticExtImageMap =[self getImageMap];
+    });
+}
+
+- (NSDictionary*)getDoucmentTypeMap {
+    
+    NSString *pictureString = @"jpg、jpeg、png、bmp、gif";
+    NSString *documentString = @"txt、doc、docx、ppt、pptx、xls、xlsx、pdf";
+    NSString *videoString = @"avi、rmvb、rm、asf、divx、mpg、mpeg、mpe、wmv、mp4、mkv、vob";
+    NSString *audioString = @"mp3、wma、wav";
+    NSString *zipString = @"rar、zip";
+    
+    
+    NSDictionary *map = @{@"pic": pictureString,
+                          @"doc": documentString,
+                          @"video": videoString,
+                          @"audio": audioString,
+                          @"zip": zipString};
+    return map;
+}
+
+- (NSDictionary*)getImageMap {
+    return @{@"pic" : @"图片",
+             @"doc" : @"文档",
+             @"video": @"视频",
+             @"audio": @"音乐",
+             @"zip": @"压缩" };
 }
 
 @end

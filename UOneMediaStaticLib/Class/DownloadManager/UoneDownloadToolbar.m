@@ -23,6 +23,7 @@
         
         self.backgroundColor = UIColorFromHex(0xffffff);
         self.isEditing = NO;
+        self.isLabelMode = YES;
         //全选 按钮
         selectAllButton = [UIButton buttonWithType:UIButtonTypeCustom];
         selectAllButton.backgroundColor = [UIColor clearColor];
@@ -127,14 +128,29 @@
         diskUsageAndStorageLabel.hidden = YES;
         editButton.hidden = YES;
     } else {
+        if (_isLabelMode) {
+            editButton.hidden = YES;
+        } else {
+            editButton.hidden = NO;
+        }
         selectAllButton.hidden = YES;
         deleteButton.hidden = YES;
         doneButton.hidden = YES;
         diskUsageAndStorageLabel.hidden = NO;
-        editButton.hidden = NO;
+        
     }
-    
-    return;
+}
+
+- (void)setIsLabelMode:(BOOL)isLabelMode {
+    _isLabelMode = isLabelMode;
+    [self layout];
+}
+
+- (void)setDeleteTitle:(NSString *)deleteTitle {
+    if (!deleteTitle && deleteTitle.length == 0) {
+        deleteTitle = @"删除";
+    }
+    [deleteButton setTitle:deleteTitle forState:UIControlStateNormal];
 }
 #pragma mark - UIButton Event
 

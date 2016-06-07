@@ -11,7 +11,7 @@
 IB_DESIGNABLE
 @interface PKCircleProgressView : UIView
 
-@property (nonatomic, assign) IBInspectable CGFloat progress; /// 0.f - 1.0f
+@property (nonatomic, assign) IBInspectable CGFloat pkProgress; /// 0.f - 1.0f
 @property (nonatomic, assign) IBInspectable CGFloat filledLineWidth; /// 0.f +
 @property (nonatomic, assign) IBInspectable CGFloat emptyLineWidth; /// 0.f +
 @property (nonatomic, assign) IBInspectable CGFloat radius; /// 0.f +

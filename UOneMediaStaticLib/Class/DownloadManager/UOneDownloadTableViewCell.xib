@@ -83,6 +83,7 @@
                 <outlet property="fileLabel" destination="20v-RA-GwB" id="pFs-10-hmA"/>
                 <outlet property="iconImage" destination="SiL-xB-iTo" id="KyC-4f-lvd"/>
                 <outlet property="progressView" destination="EOz-wz-aEQ" id="inh-RW-hzj"/>
+                <outlet property="progressViewWidthConstraint" destination="aWs-rE-rNw" id="Jta-IO-TD7"/>
                 <outlet property="sizeLabel" destination="HSi-Ik-ATa" id="Xqj-C8-5ME"/>
             </connections>
             <point key="canvasLocation" x="551" y="272.5"/>

@@ -17,7 +17,7 @@
 @required
 -(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController canPreviewItem:(BOOL)canPreviewItem;
 -(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController canPresentOptionsMenu:(BOOL)canPresentOptionsMenu;
-
+-(void)downladViewController:(nonnull UOneDownloadViewController *)downloadViewController didClickDeleteButtonWithAlertView:(BOOL)isClickDeleteButton;
 @end
 
 @interface UOneDownloadViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UOneDownloadTableViewCellDelegate>

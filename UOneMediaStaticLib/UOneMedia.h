@@ -30,6 +30,8 @@ FOUNDATION_EXPORT const unsigned char UOneMediaVersionString[];
 #import "PKBorderedButton.h"
 
 #import "SWTableViewCell.h"
+#import "WSPXAlertManager.h"
+#import "UIAlertView+WSPXUtility.h"
 @interface UOneMedia : NSObject
 
 + (void) start;
