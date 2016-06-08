@@ -43,5 +43,5 @@ extern NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification;
 
 - (NSDictionary *)downloadItemInfomation:(nonnull WspxDownloadItem *)aDownloadItem;
 
-- (NSString *)getDiskUsageAndStorageString;
+- (nonnull NSString *)getDiskUsageAndStorageString;
 @end

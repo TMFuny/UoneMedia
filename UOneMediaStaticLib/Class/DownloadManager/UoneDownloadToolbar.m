@@ -103,6 +103,9 @@
     //连接上面定义的坐标点
     CGContextStrokePath(context);
 }
+- (void)layoutSubviews {
+    [self layout];
+}
 -(void)layout {
     
     CGFloat width = self.frame.size.width;
@@ -146,7 +149,7 @@
     [self layout];
 }
 
-- (void)setDeleteTitle:(NSString *)deleteTitle {
+- (void)setDeleteTitle:(nullable NSString *)deleteTitle {
     if (!deleteTitle && deleteTitle.length == 0) {
         deleteTitle = @"删除";
     }

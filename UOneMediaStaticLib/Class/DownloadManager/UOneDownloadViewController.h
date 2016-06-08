@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 #include "UOneDownloadTableViewCell.h"
-@class UoneDownloadToolbar;
+#import "UoneDownloadToolbar.h"
 @class UOneDownloadViewController;
 
 @protocol UoneDownloadViewControllerDelegate <NSObject>
@@ -27,4 +27,10 @@
 @property (nonnull, nonatomic, strong) WspxDownloadManager* downloadManager;
 @property (nullable, assign) id <UoneDownloadViewControllerDelegate> delegate;
 - (void)presentOptionsMenu;
+- (void)showAlertViewWithTitle:(nullable NSString*)title
+                       message:(nullable NSString*)message
+                   cancelTitle:(nullable NSString*)cancelTitle
+                  cancelAction:(void(^ __nullable)())cancelBlock
+                  confirmTitle:(nullable NSString*)confirmTitle
+                 confirmAction:(void(^ __nullable)()) confirmBlock;
 @end

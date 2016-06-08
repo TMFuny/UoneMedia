@@ -26,7 +26,9 @@
     [super awakeFromNib];
     _bundle = [NSBundle bundleWithURL:[[NSBundle mainBundle] URLForResource:@"UOneMedia" withExtension:@"bundle"]];
     _downloadItem = nil;
+    
     [self initFileExtImageMap];
+    
     // Initialization code
     [self.fileLabel setFont:[UIFont systemFontOfSize:15]];
     [self.sizeLabel setFont:[UIFont systemFontOfSize:13]];
@@ -43,7 +45,7 @@
     NSMutableArray* rightButtons = [[NSMutableArray alloc] initWithCapacity:1];
 
     [rightButtons sw_addUtilityButtonWithColor:UIColorFromHex(0xFE5443)
-                                          icon:[UIImage imageNamed:@"history_item_delete" inBundle:_bundle compatibleWithTraitCollection:nil]];
+                                          icon:[UIImage imageNamed:@"UOneMedia.bundle/history_item_delete"]];
     
     [self  setRightUtilityButtons:rightButtons WithButtonWidth:58.0f];
     
@@ -226,17 +228,26 @@
 - (UIImage *)imageWithFileExt:(NSString*)fileExt {
     NSArray* allKeys = [staticMap allKeys];
     __block NSString *imageKey = @"未知文件";
+    
     [allKeys enumerateObjectsUsingBlock:^(NSString* obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSString* filterString = [staticMap objectForKey:obj];
-        if ([filterString containsString:fileExt]) {
-            stop = YES;
-            imageKey = obj;
+        if ([filterString respondsToSelector:@selector(containsString:)]) {
+            if ([filterString containsString:fileExt]) {
+                stop = YES;
+                imageKey = obj;
+            }
+        } else {
+            NSRange range = [filterString rangeOfString:fileExt];
+            if(range.location != NSNotFound){
+                stop = YES;
+                imageKey = obj;
+            }
         }
     }];
     
     UIImage * iconImage = [UIImage imageNamed:[staticExtImageMap objectForKey:imageKey]];
     
-    return iconImage != nil ? iconImage : [UIImage imageNamed:@"未知文件"];
+    return iconImage != nil ? iconImage : [UIImage imageNamed:@"UOneMedia.bundle/未知文件"];
 }
 
 - (NSString *)splitFilenameFromUrl:(NSString *)strUrl {
@@ -316,11 +327,11 @@ static NSDictionary *staticExtImageMap = nil;
 }
 
 - (NSDictionary*)getImageMap {
-    return @{@"pic" : @"图片",
-             @"doc" : @"文档",
-             @"video": @"视频",
-             @"audio": @"音乐",
-             @"zip": @"压缩" };
+    return @{@"pic" : @"UOneMedia.bundle/图片",
+             @"doc" : @"UOneMedia.bundle/文档",
+             @"video": @"UOneMedia.bundle/视频",
+             @"audio": @"UOneMedia.bundle/音乐",
+             @"zip": @"UOneMedia.bundle/压缩" };
 }
 
 @end

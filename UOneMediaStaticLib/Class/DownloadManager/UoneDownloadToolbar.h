@@ -28,5 +28,5 @@
 @property (weak, nonatomic) id<UoneDownloadToolbarDelegate> customedDelegate;
 
 -(void)layout;
--(void)setDeleteTitle:(NSString*)deleteTitle;
+-(void)setDeleteTitle:(nullable NSString*)deleteTitle;
 @end

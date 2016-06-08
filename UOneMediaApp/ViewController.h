@@ -17,6 +17,5 @@
 - (IBAction) onReset:(UIButton *)button;
 - (IBAction) onDelete:(UIButton *)button;
 - (IBAction) onNavigate:(UIButton *)button;
-- (IBAction)onDownloadAllItem:(UIButton *)sender;
 @end
 

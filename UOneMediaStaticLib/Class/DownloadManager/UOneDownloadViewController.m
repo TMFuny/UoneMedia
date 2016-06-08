@@ -33,6 +33,7 @@ UOneDownloadTableViewCellDelegate>
     WSPXAlertManager* _alertManager;
     NSMutableArray* _downloadList;
 }
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -54,35 +55,49 @@ UOneDownloadTableViewCellDelegate>
     [self refreshDownloadList];
     
     if (!self.tableView) {
-        NSLog(@"self.view.frame: %@", NSStringFromCGRect(self.view.frame));
+        if ([self.view superview]) {
+            NSLog(@"self.view.superview.frame:%@ bounds:%@", NSStringFromCGRect(self.view.superview.frame), NSStringFromCGRect(self.view.superview.bounds));
+        }
+        NSLog(@"self.view.frame: %@ bounds:%@", NSStringFromCGRect(self.view.frame), NSStringFromCGRect(self.view.bounds));
         self.tableView = [[UITableView alloc]initWithFrame:self.view.frame style:UITableViewStylePlain];
         [self.view addSubview:self.tableView];
     }
     
     //创建 BlankView 背景
     _blankView = [[UIView alloc] initWithFrame:_tableView.bounds];
-    UIImageView *emptyImageView1 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bookmark_empty"]];
+    /*************
+        http://stackoverflow.com/questions/22869670/how-can-i-load-an-image-from-assets-car-compiled-version-of-xcassets-within-an
+     ************/
+  
+    UIImageView *emptyImageView1 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"UOneMedia.bundle/无下载任务"]];
     emptyImageView1.frame = CGRectMake(0, 80, kScreenWidth, 100);
     emptyImageView1.contentMode = UIViewContentModeScaleAspectFit;
-    
+    /*
     UILabel *tip1 = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(emptyImageView1.frame) + 20, kScreenWidth, 40)];
-    tip1.text = @"还木有收藏书签哦~";
+    tip1.text = @"暂无下载任务哦~";
     tip1.textAlignment = NSTextAlignmentCenter;
     tip1.textColor = UIColorFromHex(0xb9b9b9);
+    [_blankView addSubview:tip1];
+    */
     
     [_blankView addSubview:emptyImageView1];
-    [_blankView addSubview:tip1];
     _blankView.backgroundColor = [UIColor clearColor];
-    _blankView.hidden = YES;
+    if (_downloadList && _downloadList.count != 0) {
+        _blankView.hidden = YES;
+    } else {
+        _blankView.hidden = NO;
+    }
+    
     [_tableView addSubview:_blankView];
     
     if (!self.fileManagerToolbar) {
-        self.fileManagerToolbar = [[UoneDownloadToolbar alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 47, self.view.frame.size.width, 47)];
+        self.fileManagerToolbar = [[UoneDownloadToolbar alloc] init];
         self.fileManagerToolbar.customedDelegate = self;
         if (_downloadList && [_downloadList count] != 0) {
             self.fileManagerToolbar.isLabelMode = NO;
         }
         [self.view addSubview:self.fileManagerToolbar];
+        [self addConstraintToToolbar];
     }
     
     self.tableView.backgroundColor = UIColorFromHex(0xF6F6F6);
@@ -111,6 +126,7 @@ UOneDownloadTableViewCellDelegate>
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 #pragma mark - UIInit
 #pragma mark - UIConfig
 #pragma mark - UIUpdate
@@ -159,9 +175,11 @@ UOneDownloadTableViewCellDelegate>
     //  NSLog(@"editingStyleForRowAtIndexPath:%ld", (long)[indexPath row]);
     return UITableViewCellEditingStyleNone;
 }
+
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 72;
 }
@@ -169,6 +187,7 @@ UOneDownloadTableViewCellDelegate>
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
 }
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.tableView.isEditing) {
         return;
@@ -238,7 +257,12 @@ UOneDownloadTableViewCellDelegate>
         if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:canPresentOptionsMenu:)]) {
             [_delegate downloadViewController:self canPresentOptionsMenu:NO];
         } else {
-            [self showAlertView];
+            [self showAlertViewWithTitle:nil
+                                 message:@"找不到打开该文件的app"
+                             cancelTitle:@"知道了"
+                            cancelAction:nil
+                            confirmTitle:nil
+                           confirmAction:nil];
         }
     }
 }
@@ -279,6 +303,7 @@ UOneDownloadTableViewCellDelegate>
 
     return cell;
 }
+
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([cell isKindOfClass:[UOneDownloadTableViewCell class]]) {
         
@@ -298,6 +323,7 @@ UOneDownloadTableViewCellDelegate>
         return self;
     }
 }
+
 #pragma mark QLPreviewControllerDataSource
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -311,6 +337,7 @@ UOneDownloadTableViewCellDelegate>
     fileURL = item.localFileURL;
     return fileURL;
 }
+
 #pragma mark - ThirdPartyDataSource and Delegate
 #pragma mark  SWTableViewDelegate
 - (void)swipeableTableViewCell:(SWTableViewCell *)cell scrollingToState:(SWCellState)state {
@@ -318,6 +345,7 @@ UOneDownloadTableViewCellDelegate>
         
     }
 }
+
 - (void)swipeableTableViewCellDidEndScrolling:(SWTableViewCell *)cell {
     NSLog(@"didEndScrolling: tag:%d",(int)cell.tag);
 }
@@ -424,7 +452,7 @@ UOneDownloadTableViewCellDelegate>
 }
 
 #pragma mark - UOneDownloadTableViewCellDelegate
-- (void)tableViewCell:(nonnull UOneDownloadTableViewCell *)cell didClickedDownloadButton:(nonnull UIButton *)button {
+- (void)tableViewCell:(nonnull UOneDownloadTableViewCell *)cell didClickedfileManagerToolbar:(nonnull UIButton *)button {
     NSIndexPath * indexPath = [self.tableView indexPathForCell:cell];
     NSInteger row = indexPath.row;
     if (row < _downloadList.count) {
@@ -497,7 +525,7 @@ UOneDownloadTableViewCellDelegate>
 
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDeleteButton:(UIButton *)button {
     __weak __typeof(self) weakSelf = self;
-    [self showAlertViewWith:nil message:@"确定删除所选下载任务及其文件？" cancelTitle:@"取消" cancelAction:^{
+    [self showAlertViewWithTitle:nil message:@"确定删除所选下载任务及其文件？" cancelTitle:@"取消" cancelAction:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf updateToolbarInterface];
             [weakSelf.fileManagerToolbar layout];
@@ -540,13 +568,14 @@ UOneDownloadTableViewCellDelegate>
         }
     }
 }
-- (void)showAlertViewWith:(NSString*)title
-                  message:(NSString*)message
-              cancelTitle:(NSString*)cancelTitle
-             cancelAction:(void(^ __nullable)())cancelBlock
-             confirmTitle:(NSString*)confirmTitle
-            confirmAction:(void(^ __nullable)()) confirmBlock {
-    if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+
+- (void)showAlertViewWithTitle:(nullable NSString*)title
+                       message:(nullable NSString*)message
+                   cancelTitle:(nullable NSString*)cancelTitle
+                  cancelAction:(void(^ __nullable)())cancelBlock
+                  confirmTitle:(nullable NSString*)confirmTitle
+                 confirmAction:(void(^ __nullable)()) confirmBlock {
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
         
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                                  message:message
@@ -594,21 +623,6 @@ UOneDownloadTableViewCellDelegate>
     }
 }
 
-- (void)showAlertView {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
-                                                                             message:@"找不到打开该文件的app"
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        
-        
-    }];
-    
-    [alertController addAction:cancelAction];
-    [self presentViewController:alertController animated:YES completion:^{
-        
-    }];
-}
-
 - (NSString*)getDeleteString {
     NSString *deleteString = @"删除";
     if (_selectedIndexSet && [_selectedIndexSet count] != 0) {
@@ -628,7 +642,48 @@ UOneDownloadTableViewCellDelegate>
         self.docInteractionController.URL = url;
     }
 }
+
 - (void)setQLPreviewControllerWithURL:(NSURL *)url {
     
+}
+
+- (void)addConstraintToToolbar {
+    self.fileManagerToolbar.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutConstraint *leadingConstraint = [NSLayoutConstraint constraintWithItem:self.fileManagerToolbar
+                                                                            attribute:NSLayoutAttributeLeading
+                                                                            relatedBy:NSLayoutRelationEqual
+                                                                            toItem:self.view
+                                                                            attribute:NSLayoutAttributeLeading
+                                                                            multiplier:1
+                                                                            constant:0];
+    NSLayoutConstraint *trailingConstraint = [NSLayoutConstraint constraintWithItem:self.fileManagerToolbar
+                                                                         attribute:NSLayoutAttributeTrailing
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:self.view
+                                                                         attribute:NSLayoutAttributeTrailing
+                                                                        multiplier:1
+                                                                          constant:0];
+    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:self.fileManagerToolbar
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:self.view
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                      multiplier:1
+                                                                        constant:0];
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:self.fileManagerToolbar
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:nil
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                       multiplier:1
+                                                                         constant:47];
+    NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintWithItem:self.fileManagerToolbar
+                                                                        attribute:NSLayoutAttributeBottom
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:self.view
+                                                                        attribute:NSLayoutAttributeBottom
+                                                                       multiplier:1
+                                                                         constant:0];
+    [self.view addConstraints:@[leadingConstraint, trailingConstraint, widthConstraint, heightConstraint, bottomConstraint]];
 }
 @end
