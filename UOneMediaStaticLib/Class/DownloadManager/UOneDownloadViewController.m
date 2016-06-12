@@ -55,11 +55,9 @@ UOneDownloadTableViewCellDelegate>
     [self refreshDownloadList];
     
     if (!self.tableView) {
-        if ([self.view superview]) {
-            NSLog(@"self.view.superview.frame:%@ bounds:%@", NSStringFromCGRect(self.view.superview.frame), NSStringFromCGRect(self.view.superview.bounds));
-        }
         NSLog(@"self.view.frame: %@ bounds:%@", NSStringFromCGRect(self.view.frame), NSStringFromCGRect(self.view.bounds));
-        self.tableView = [[UITableView alloc]initWithFrame:self.view.frame style:UITableViewStylePlain];
+        CGRect tableFrame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - 47);
+        self.tableView = [[UITableView alloc]initWithFrame:tableFrame style:UITableViewStylePlain];
         [self.view addSubview:self.tableView];
     }
     
@@ -204,6 +202,7 @@ UOneDownloadTableViewCellDelegate>
             [_downloadManager startDownloadWithItem:item];
         }
             break;
+        case WspxDownloadItemStatusPending:
         case WspxDownloadItemStatusStarted:
             break;
         case WspxDownloadItemStatusPaused:
@@ -375,6 +374,7 @@ UOneDownloadTableViewCellDelegate>
 - (void)registerNotification {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidComplete:) name:wspxDownloadDidCompleteNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onProgressDidChange:) name:wspxDownloadProgressChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidPending:) name:wspxDownloadDidPendingNotification object:nil];
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTotalProgressDidChange:) name:wspxTotalDownloadProgressChangedNotification object:nil];
@@ -385,6 +385,7 @@ UOneDownloadTableViewCellDelegate>
 - (void)unregisterNotification {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidCompleteNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadProgressChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidPendingNotification object:nil];
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxTotalDownloadProgressChangedNotification object:nil];
@@ -446,13 +447,41 @@ UOneDownloadTableViewCellDelegate>
         NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
     }
 }
-
+- (void)onDownloadDidPending:(NSNotification *)aNotification {
+    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
+    NSLog(@"onProgressDidChange --> %@", aDownloadedItem);
+    
+    NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
+            return YES;
+        }
+        return NO;
+    }];
+    
+    if (aFoundDownloadItemIndex != NSNotFound) {
+        NSTimeInterval lastChangedUpdateDelta = 10.0;
+        if (aDownloadedItem.lastUpdateTime)
+        {
+            lastChangedUpdateDelta = [[NSDate date] timeIntervalSinceDate:aDownloadedItem.lastUpdateTime];
+        }
+        if (lastChangedUpdateDelta > 0.25) {
+            NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
+            if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
+                UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
+                [cell resetWithDownloadItem:aDownloadedItem];
+            }
+            aDownloadedItem.lastUpdateTime = [NSDate date];
+        }
+    } else {
+        NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+}
 - (void)onTotalProgressDidChange:(NSNotification *)aNotification {
     NSLog(@"onTotalProgressDidChange -->");
 }
 
 #pragma mark - UOneDownloadTableViewCellDelegate
-- (void)tableViewCell:(nonnull UOneDownloadTableViewCell *)cell didClickedfileManagerToolbar:(nonnull UIButton *)button {
+- (void)tableViewCell:(nonnull UOneDownloadTableViewCell *)cell didClickedDownloadButton:(nonnull UIButton *)button {
     NSIndexPath * indexPath = [self.tableView indexPathForCell:cell];
     NSInteger row = indexPath.row;
     if (row < _downloadList.count) {
@@ -469,6 +498,7 @@ UOneDownloadTableViewCellDelegate>
                 }
             case WspxDownloadItemStatusCancelled:
                 break;
+            case WspxDownloadItemStatusPending:
             case WspxDownloadItemStatusStarted:
                 [_downloadManager pauseDownloadWithItem:downloadItem];
                 break;

@@ -10,6 +10,7 @@
 
 typedef NS_ENUM(NSUInteger, WspxDownloadItemStatus) {
     WspxDownloadItemStatusNotStarted = 0,
+    WspxDownloadItemStatusPending,
     WspxDownloadItemStatusStarted,
     WspxDownloadItemStatusCompleted,
     WspxDownloadItemStatusPaused,

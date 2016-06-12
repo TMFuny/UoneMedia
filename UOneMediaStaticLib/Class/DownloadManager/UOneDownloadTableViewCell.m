@@ -9,6 +9,10 @@
 #import "UOneDownloadTableViewCell.h"
 #import "WspxDownloadManager.h"
 
+@interface UOneDownloadTableViewCell ()<PKDownloadButtonDelegate>
+
+@end
+
 @implementation UOneDownloadTableViewCell
 {
     NSBundle * _bundle;
@@ -87,6 +91,7 @@
     
     
     [self.progressView addConstraints:@[centerXConstraint, centerYConstraint, widthConstraint, heightConstraint]];
+    self.downloadButton.delegate = self;
     self.downloadButton.progressColor = UIColorFromHex(0xbdbdbd);
     self.downloadButton.progressTrackColor = UIColorFromHex(0xffb72c);
     self.downloadButton.progressPendingColor = UIColorFromHex(0xbdbdbd);
@@ -114,6 +119,12 @@
     WspxDownloadItemStatus downloadStatus = aDownloadItem.status;
     switch (downloadStatus) {
         case WspxDownloadItemStatusNotStarted:
+        case WspxDownloadItemStatusCancelled:
+        {
+            //do nothing
+            break;
+        }
+        case WspxDownloadItemStatusPending:
         {
             [sizeString appendString:@" | 正在获取"];
             self.downloadButton.state = kPKDownloadButtonState_Pending;
@@ -131,11 +142,7 @@
             self.downloadButton.state = kPKDownloadButtonState_Downloaded;
             break;
         }
-        case WspxDownloadItemStatusCancelled:
-        {
-            //do nothing
-            break;
-        }
+        
         case WspxDownloadItemStatusStarted:
         {
             [sizeString appendString:@" | "];
@@ -217,7 +224,7 @@
     }
     return;
 }
-
+#pragma mark - PKDownloadButtonDelegate
 - (void)downloadButtonTapped:(PKDownloadButton *)downloadButton
                 currentState:(PKDownloadButtonState)state {
     [self onTapGesture:nil];

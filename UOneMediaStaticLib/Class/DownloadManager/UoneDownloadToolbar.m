@@ -120,7 +120,7 @@
         selectAllButton.frame   = CGRectMake(20, 0, btnWidth, btnHeight);
     }
     
-    deleteButton.frame   = CGRectMake(CGRectGetMaxX(selectAllButton.frame) + 15, 0, btnWidth, btnHeight);
+    deleteButton.frame   = CGRectMake(CGRectGetMaxX(selectAllButton.frame) + 15, 0, 80, btnHeight);
     diskUsageAndStorageLabel.frame = CGRectMake(btnWidth, 0, width - 2*btnWidth, btnHeight);
     doneButton.frame   = CGRectMake(width - btnWidth - 20, 0, btnWidth, btnHeight);
     editButton.frame   = CGRectMake(width - btnWidth - 20, 0, btnWidth, btnHeight);

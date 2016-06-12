@@ -11,6 +11,7 @@
 
 
 extern NSString* _Nonnull const wspxDownloadDidCompleteNotification;
+extern NSString* _Nonnull const wspxDownloadDidPendingNotification;
 extern NSString* _Nonnull const wspxDownloadProgressChangedNotification;
 extern NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification;
 
@@ -43,5 +44,9 @@ extern NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification;
 
 - (NSDictionary *)downloadItemInfomation:(nonnull WspxDownloadItem *)aDownloadItem;
 
+- (BOOL)hasActiveDownloads;
+
 - (nonnull NSString *)getDiskUsageAndStorageString;
+
+- (uint64_t)getFreeDiskspaceInBytes;
 @end

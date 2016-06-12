@@ -14,6 +14,7 @@
 static void *WspxDownloadManagerProgressObserverContext = &WspxDownloadManagerProgressObserverContext;
 
 NSString* _Nonnull const wspxDownloadDidCompleteNotification            = @"wspxDownloadDidCompleteNotification";
+NSString* _Nonnull const wspxDownloadDidPendingNotification             = @"wspxDownloadDidPendingNotification";
 NSString* _Nonnull const wspxDownloadProgressChangedNotification        = @"wspxDownloadProgressChangedNotification";
 NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspxTotalDownloadProgressChangedNotification";
 
@@ -154,8 +155,12 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
         BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:aDownloadItem.downloadIdentifier];
         if (isDownloading == NO)
         {
-            aDownloadItem.status = WspxDownloadItemStatusStarted;
+            aDownloadItem.status = WspxDownloadItemStatusPending;
             
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDidPendingNotification object:aDownloadItem];
+            });
             [self storeDownloadItems];
             
             // kick off individual download
@@ -245,14 +250,14 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
             [_fileDownloader pauseDownloadWithIdentifier:aDownloadItem.downloadIdentifier];
         }
     } else {
-        if (aDownloadItem.status == WspxDownloadItemStatusStarted) {
+        if (aDownloadItem.status == WspxDownloadItemStatusStarted || aDownloadItem.status == WspxDownloadItemStatusPending) {
             aDownloadItem.status = WspxDownloadItemStatusPaused;
             [self storeDownloadItems];
         }
     }
 }
 
-- (void)pauseAllDownloalItems {
+- (void)pauseAllDownloadItems {
     for(WspxDownloadItem* item in self.downloadItems) {
         BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:item.downloadIdentifier];
         if (isDownloading)
@@ -264,7 +269,7 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
                 [_fileDownloader pauseDownloadWithIdentifier:item.downloadIdentifier];
             }
         } else {
-            if (item.status == WspxDownloadItemStatusStarted) {
+            if (item.status == WspxDownloadItemStatusStarted || item.status == WspxDownloadItemStatusPending) {
                 item.status = WspxDownloadItemStatusPaused;
                 [self storeDownloadItems];
             }
@@ -409,6 +414,9 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
     if (aFoundDownloadItemIndex != NSNotFound)
     {
         aChangedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
+        if (aChangedDownloadItem.status = WspxDownloadItemStatusPending) {
+            aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
+        }
         HWIFileDownloadProgress *aFileDownloadProgress = [_fileDownloader downloadProgressForIdentifier:aDownloadIdentifier];
         if (aFileDownloadProgress)
         {
@@ -552,6 +560,10 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
     }
     return items;
 }
+
+- (BOOL)hasActiveDownloads {
+    return [_fileDownloader hasActiveDownloads];
+}
 - (NSString *)getDiskUsageAndStorageString {
     uint64_t totalSpace = 0;
     uint64_t totalFreeSpace = 0;
@@ -575,4 +587,24 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
     
     return [NSString stringWithFormat:@"可用%@GB/共%@GB",totalFreeSpaceString, totalSpaceString];
 }
+
+- (uint64_t)getFreeDiskspaceInBytes {
+    uint64_t totalSpace = 0;
+    uint64_t totalFreeSpace = 0;
+    NSError *error = nil;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSDictionary *dictionary = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject] error: &error];
+    
+    if (dictionary) {
+        NSNumber *fileSystemSizeInBytes = [dictionary objectForKey: NSFileSystemSize];
+        NSNumber *freeFileSystemSizeInBytes = [dictionary objectForKey:NSFileSystemFreeSize];
+        totalSpace = [fileSystemSizeInBytes unsignedLongLongValue];
+        totalFreeSpace = [freeFileSystemSizeInBytes unsignedLongLongValue];
+        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll));
+    } else {
+        NSLog(@"Error Obtaining System Memory Info: Domain = %@, Code = %ld", [error domain], (long)[error code]);
+    }
+    return totalFreeSpace;
+}
+
 @end
