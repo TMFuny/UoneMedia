@@ -176,5 +176,8 @@
  */
 - (nullable NSProgress *)rootProgress;
 
-
+/**
+ Called when the download file is big then the systemFileFreeSizeInBytes.
+ */
+- (void)downloadStorageAlmostFull;
 @end

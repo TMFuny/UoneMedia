@@ -50,3 +50,4 @@ extern NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification;
 
 - (uint64_t)getFreeDiskspaceInBytes;
 @end
+//TODO NSURLSessionDownloadTask issues with Storage almost full disk warnings https://forums.developer.apple.com/thread/43263

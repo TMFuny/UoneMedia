@@ -17,6 +17,7 @@ NSString* _Nonnull const wspxDownloadDidCompleteNotification            = @"wspx
 NSString* _Nonnull const wspxDownloadDidPendingNotification             = @"wspxDownloadDidPendingNotification";
 NSString* _Nonnull const wspxDownloadProgressChangedNotification        = @"wspxDownloadProgressChangedNotification";
 NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspxTotalDownloadProgressChangedNotification";
+NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspxDownloadDiskStorageNotEnoughNotification";
 
 @interface WspxDownloadManager() <HWIFileDownloadDelegate>
 
@@ -424,9 +425,11 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
     if (aFoundDownloadItemIndex != NSNotFound)
     {
         aChangedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
-        if (aChangedDownloadItem.status = WspxDownloadItemStatusPending) {
+        if (aChangedDownloadItem.status = WspxDownloadItemStatusPending)
+        {
             aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
         }
+        
         HWIFileDownloadProgress *aFileDownloadProgress = [_fileDownloader downloadProgressForIdentifier:aDownloadIdentifier];
         if (aFileDownloadProgress)
         {
@@ -436,6 +439,10 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
                 aFileDownloadProgress.lastLocalizedDescription = aFileDownloadProgress.nativeProgress.localizedDescription;
                 aFileDownloadProgress.lastLocalizedAdditionalDescription = aFileDownloadProgress.nativeProgress.localizedAdditionalDescription;
             }
+        }
+        if (aChangedDownloadItem.expectedFileSizeInBytes > [self getFreeDiskspaceInBytes]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:aChangedDownloadItem];
+            [self pauseDownloadWithItem:aChangedDownloadItem];
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadProgressChangedNotification object:aChangedDownloadItem];
@@ -525,7 +532,9 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
     return anIsValidFlag;
 }
 
-
+- (void)downloadStorageAlmostFull {
+    
+}
 #pragma mark - Persistence
 
 - (NSString*)plistFilename
@@ -574,6 +583,7 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
 - (BOOL)hasActiveDownloads {
     return [_fileDownloader hasActiveDownloads];
 }
+
 - (NSString *)getDiskUsageAndStorageString {
     uint64_t totalSpace = 0;
     uint64_t totalFreeSpace = 0;
@@ -599,22 +609,7 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
 }
 
 - (uint64_t)getFreeDiskspaceInBytes {
-    uint64_t totalSpace = 0;
-    uint64_t totalFreeSpace = 0;
-    NSError *error = nil;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSDictionary *dictionary = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject] error: &error];
-    
-    if (dictionary) {
-        NSNumber *fileSystemSizeInBytes = [dictionary objectForKey: NSFileSystemSize];
-        NSNumber *freeFileSystemSizeInBytes = [dictionary objectForKey:NSFileSystemFreeSize];
-        totalSpace = [fileSystemSizeInBytes unsignedLongLongValue];
-        totalFreeSpace = [freeFileSystemSizeInBytes unsignedLongLongValue];
-        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll));
-    } else {
-        NSLog(@"Error Obtaining System Memory Info: Domain = %@, Code = %ld", [error domain], (long)[error code]);
-    }
-    return totalFreeSpace;
+    return [self.fileDownloader getFreeDiskspaceInBytes];
 }
 
 @end

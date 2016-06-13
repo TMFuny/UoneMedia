@@ -40,6 +40,7 @@
 @interface HWIFileDownloader()<NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate, NSURLConnectionDelegate>
 
 @property (nonatomic, strong, nullable) NSURLSession *backgroundSession;
+@property (nonatomic, strong, nonnull) NSMutableArray<NSString *> *deActiveDownloadsArray;
 @property (nonatomic, strong, nonnull) NSMutableDictionary<NSNumber *, HWIFileDownloadItem *> *activeDownloadsDictionary;
 @property (nonatomic, strong, nonnull) NSMutableArray<NSDictionary <NSString *, NSObject *> *> *waitingDownloadsArray;
 @property (nonatomic, weak, nullable) NSObject<HWIFileDownloadDelegate>* fileDownloadDelegate;
@@ -78,6 +79,7 @@
         self.fileDownloadDelegate = aDelegate;
         self.activeDownloadsDictionary = [NSMutableDictionary dictionary];
         self.waitingDownloadsArray = [NSMutableArray array];
+        self.deActiveDownloadsArray = [NSMutableArray array];
         self.highestDownloadID = 0;
         
         if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
@@ -186,7 +188,8 @@
 - (void)startDownloadWithIdentifier:(nonnull NSString *)aDownloadIdentifier
                       fromRemoteURL:(nonnull NSURL *)aRemoteURL
 {
-    [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
+//    [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
+    [self startDataTaskWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
 }
 
 
@@ -196,6 +199,31 @@
     [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:nil usingResumeData:aResumeData];
 }
 
+- (void)startDataTaskWithDownloadToken:(nonnull NSString *)aDownloadToken
+                         fromRemoteURL:(nullable NSURL *)aRemoteURL
+                       usingResumeData:(nullable NSData *)aResumeData {
+    NSUInteger aDownloadID = 0;
+    NSURLSessionDataTask *aDataTask = nil;
+    if (aResumeData) {
+        [self startDataTaskWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:aResumeData];
+    } else {
+        if (![self.deActiveDownloadsArray containsObject:aDownloadToken]) {
+            if (aRemoteURL) {
+                aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
+            }
+            aDownloadID = aDataTask.taskIdentifier;
+            aDataTask.taskDescription = aDownloadToken;
+            
+            [self.deActiveDownloadsArray addObject:aDownloadToken];
+            [aDataTask resume];
+        } else {
+            [self startDownloadWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:nil];
+        }
+        
+    }
+    
+    
+}
 
 - (void)startDownloadWithDownloadToken:(nonnull NSString *)aDownloadToken
                          fromRemoteURL:(nullable NSURL *)aRemoteURL
@@ -739,6 +767,17 @@
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+    if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
+        //TODO get the downloadItem from array.
+        if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
+            [self.fileDownloadDelegate downloadStorageAlmostFull];
+        }
+    } else {
+        if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
+            [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
+        }
+    }
+
     
     HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(dataTask.taskIdentifier)];
     if (aDownloadItem)
@@ -1445,5 +1484,23 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
     return aDescriptionString;
 }
 
+- (uint64_t)getFreeDiskspaceInBytes {
+    uint64_t totalSpace = 0;
+    uint64_t totalFreeSpace = 0;
+    NSError *error = nil;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSDictionary *dictionary = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[paths lastObject] error: &error];
+    
+    if (dictionary) {
+        NSNumber *fileSystemSizeInBytes = [dictionary objectForKey: NSFileSystemSize];
+        NSNumber *freeFileSystemSizeInBytes = [dictionary objectForKey:NSFileSystemFreeSize];
+        totalSpace = [fileSystemSizeInBytes unsignedLongLongValue];
+        totalFreeSpace = [freeFileSystemSizeInBytes unsignedLongLongValue];
+        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll));
+    } else {
+        NSLog(@"Error Obtaining System Memory Info: Domain = %@, Code = %ld", [error domain], (long)[error code]);
+    }
+    return totalFreeSpace;
+}
 @end
 
