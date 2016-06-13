@@ -32,6 +32,7 @@ UOneDownloadTableViewCellDelegate>
     UIView* _blankView;
     WSPXAlertManager* _alertManager;
     NSMutableArray* _downloadList;
+    NSMutableArray* _deleteList;
 }
 
 - (instancetype)init {
@@ -52,6 +53,8 @@ UOneDownloadTableViewCellDelegate>
     self.downloadManager = [WspxDownloadManager shareInstance];
     _selectedIndexSet = [NSMutableIndexSet indexSet];
     _downloadList = [[NSMutableArray alloc] init];
+    _deleteList = [[NSMutableArray alloc] init];
+    
     [self refreshDownloadList];
     
     if (!self.tableView) {
@@ -355,7 +358,7 @@ UOneDownloadTableViewCellDelegate>
     NSIndexPath *indexPath = [_tableView indexPathForCell:cell];
     if (indexPath && indexPath.row < [list count]) {
         WspxDownloadItem* item = [list objectAtIndex:indexPath.row];
-        
+        [self.downloadManager cancelDownloadWithItem:item];
         [self.downloadManager removeDownloadWithItem:item];
         
         [list removeObject:item];
@@ -565,20 +568,27 @@ UOneDownloadTableViewCellDelegate>
         dispatch_async(dispatch_get_main_queue(), ^{
             
             NSUInteger i = 0;
+            [weakSelf.tableView beginUpdates];
+            
             NSMutableArray *indexPaths = [NSMutableArray new];
+            [_deleteList removeAllObjects];
             if (_selectedIndexSet != nil && [_selectedIndexSet count] > 0) {
-                for (i = [_selectedIndexSet firstIndex]; i!= NSNotFound; i = [_selectedIndexSet indexGreaterThanIndex: i]) {
+                for (i = [_selectedIndexSet lastIndex]; i!= NSNotFound; i = [_selectedIndexSet indexLessThanIndex: i]) {
                     WspxDownloadItem *item = [_downloadList objectAtIndex:i];
                     if (item) {
-                        [weakSelf.downloadManager removeDownloadWithItem:item];
+                        [_deleteList addObject:item];
+                        [_downloadList removeObject:item];
+                        NSIndexPath* indexPath = [NSIndexPath indexPathForRow:i inSection:0];
+                        [indexPaths addObject:indexPath];
                     }
-                    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:i inSection:0];
-                    [indexPaths addObject:indexPath];
                 }
                 
-                [weakSelf refreshDownloadList];
+                
                 [_selectedIndexSet removeAllIndexes];
                 [weakSelf.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationLeft];
+                [weakSelf.tableView endUpdates];
+                [self deleteDownloadItemOfDownloadManager];
+                [_deleteList removeAllObjects];
                 [weakSelf updateToolbarInterface];
                 [weakSelf.fileManagerToolbar layout];
             }
@@ -593,9 +603,38 @@ UOneDownloadTableViewCellDelegate>
 -(void) refreshDownloadList {
     [_downloadList removeAllObjects];
     if (self.downloadManager.downloadItems && [self.downloadManager.downloadItems count] != 0) {
-        for (WspxDownloadItem* item in [self.downloadManager downloadItems]) {
-            [_downloadList addObject:item];
+        NSArray *downloadItems = [[self.downloadManager downloadItems] copy];
+        for (WspxDownloadItem* item in downloadItems) {
+            if (item.status == WspxDownloadItemStatusDeleted) {
+                [self.downloadManager removeDownloadWithItem:item];
+            } else {
+                [_downloadList addObject:item];
+            }
         }
+    }
+}
+
+- (void) deleteDownloadItemOfDownloadManager {
+    if (_deleteList && [_deleteList count] != 0) {
+        
+        if ([_deleteList count] == [_downloadList count]) {
+            [self.downloadManager cancelAllDownloadItems];
+            [self.downloadManager removeAllDownloadItems];
+            return;
+        }
+        
+        NSArray *downloadItems = [[self.downloadManager downloadItems] copy];
+        for (WspxDownloadItem *item1 in _deleteList) {
+            if (downloadItems && [downloadItems count] != 0) {
+                for (WspxDownloadItem *item2 in downloadItems) {
+                    if ([item2.downloadIdentifier isEqualToString:item1.downloadIdentifier]) {
+                        [self.downloadManager cancelDownloadWithItem:item2];
+                        [self.downloadManager removeDownloadWithItem:item2];
+                    }
+                }
+            }
+        }
+        return;
     }
 }
 

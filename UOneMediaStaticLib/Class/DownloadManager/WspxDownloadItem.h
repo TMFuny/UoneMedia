@@ -15,6 +15,7 @@ typedef NS_ENUM(NSUInteger, WspxDownloadItemStatus) {
     WspxDownloadItemStatusCompleted,
     WspxDownloadItemStatusPaused,
     WspxDownloadItemStatusCancelled,
+    WspxDownloadItemStatusDeleted,
     WspxDownloadItemStatusInterrupted,
     WspxDownloadItemStatusError
 };

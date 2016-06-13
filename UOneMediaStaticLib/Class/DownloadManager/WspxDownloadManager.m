@@ -250,7 +250,7 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
             [_fileDownloader pauseDownloadWithIdentifier:aDownloadItem.downloadIdentifier];
         }
     } else {
-        if (aDownloadItem.status == WspxDownloadItemStatusStarted || aDownloadItem.status == WspxDownloadItemStatusPending) {
+        if ((aDownloadItem.status == WspxDownloadItemStatusStarted) || (aDownloadItem.status == WspxDownloadItemStatusPending)) {
             aDownloadItem.status = WspxDownloadItemStatusPaused;
             [self storeDownloadItems];
         }
@@ -269,7 +269,7 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
                 [_fileDownloader pauseDownloadWithIdentifier:item.downloadIdentifier];
             }
         } else {
-            if (item.status == WspxDownloadItemStatusStarted || item.status == WspxDownloadItemStatusPending) {
+            if ((item.status == WspxDownloadItemStatusStarted) || (item.status == WspxDownloadItemStatusPending)) {
                 item.status = WspxDownloadItemStatusPaused;
                 [self storeDownloadItems];
             }
@@ -278,11 +278,25 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
 }
 #pragma mark - Remove Download Item
 
-- (void)removeDownloadWithItem:(nonnull WspxDownloadItem*)aDownloadItem {
+- (void)removeDownloadWithItem:(nonnull WspxDownloadItem*)aRemoveDownloadItem {
 
-    BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:aDownloadItem.downloadIdentifier];
+    BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:aRemoveDownloadItem.downloadIdentifier];
     if (!isDownloading) {
-        [self.downloadItems removeObject:aDownloadItem];
+        [self.downloadItems removeObject:aRemoveDownloadItem];
+    } else {
+        NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {
+            if ([aRemoveDownloadItem.downloadIdentifier isEqualToString:aDownloadItem.downloadIdentifier]) {
+                return YES;
+            }
+            return NO;
+        }];
+        if (aFoundDownloadItemIndex != NSNotFound) {
+            WspxDownloadItem *aTempDownloadItem = nil;
+            aTempDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
+            aTempDownloadItem.status = WspxDownloadItemStatusDeleted;
+        } else {
+            NSLog(@"failed found DownloadItem with : %@", aRemoveDownloadItem.downloadIdentifier);
+        }
     }
     [self storeDownloadItems];
 }
@@ -292,12 +306,8 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
 - (void)removeAllDownloadItems {
     NSArray* allItems = [self.downloadItems copy];
     for(WspxDownloadItem* item in allItems) {
-        BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:item.downloadIdentifier];
-        if (!isDownloading) {
-            [self.downloadItems removeObject:item];
-        }
+        [self removeDownloadWithItem:item];
     }
-    [self storeDownloadItems];
 }
 
 #pragma mark - Network Activity Indicator
@@ -360,7 +370,7 @@ NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspx
         aFailedDownloadItem.downloadError = anError;
         aFailedDownloadItem.downloadErrorMessagesStack = anErrorMessagesStack;
         // download status heuristics
-        if (aFailedDownloadItem.status != WspxDownloadItemStatusPaused) {
+        if ((aFailedDownloadItem.status != WspxDownloadItemStatusPaused) && (aFailedDownloadItem.status != WspxDownloadItemStatusDeleted)) {
             if (aResumeData.length > 0) {
                 aFailedDownloadItem.status = WspxDownloadItemStatusInterrupted;
             } else if ([anError.domain isEqualToString:NSURLErrorDomain] && (anError.code == NSURLErrorCancelled)) {
