@@ -14,7 +14,7 @@ extern NSString* _Nonnull const wspxDownloadDidCompleteNotification;
 extern NSString* _Nonnull const wspxDownloadDidPendingNotification;
 extern NSString* _Nonnull const wspxDownloadProgressChangedNotification;
 extern NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification;
-
+extern NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification;
 @class WspxDownloadItem;
 
 @interface WspxDownloadManager : NSObject

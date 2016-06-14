@@ -109,7 +109,7 @@
 }
 
 - (void)resetWithDownloadItem : ( WspxDownloadItem * _Nonnull )aDownloadItem {
-    self.fileLabel.text = [self splitFilenameFromUrl:aDownloadItem.remoteURL.absoluteString];
+    self.fileLabel.text = [self splitFilenameFromUrl:aDownloadItem.remoteURL.path];
     
    NSMutableString *sizeString = [[self jointWithExpectedSize: _downloadItem.expectedFileSizeInBytes receivedSize:_downloadItem.receivedFileSizeInBytes] mutableCopy];
     self.iconImage.image = [self imageWithFileExt:[self splitExtFromFilename: self.fileLabel.text]];

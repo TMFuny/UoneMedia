@@ -169,6 +169,7 @@ UOneDownloadTableViewCellDelegate>
         _blankView.hidden = YES;
     }
 }
+
 #pragma mark - AppleDataSource and Delegate
 #pragma mark - UITableViewDelegate
 
@@ -215,6 +216,9 @@ UOneDownloadTableViewCellDelegate>
             break;
         case WspxDownloadItemStatusCompleted:
         {
+            if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickCellForPreview:)]) {
+                [_delegate downloadViewController:self didClickCellForPreview:indexPath];
+            }
             NSURL *fileUrl = [NSURL fileURLWithPath:item.localFileURL.absoluteString isDirectory:YES];
             BOOL isCanPreview = [QLPreviewController canPreviewItem:fileUrl];
             if (isCanPreview) {
@@ -235,8 +239,6 @@ UOneDownloadTableViewCellDelegate>
                     [self presentOptionsMenu];
                 }
             }
-            
-            
         }
             break;
     }
@@ -354,21 +356,31 @@ UOneDownloadTableViewCellDelegate>
 
 - (void)swipeableTableViewCell:(SWTableViewCell *)cell didTriggerRightUtilityButtonWithIndex:(NSInteger)index {
     NSLog(@"didTriggerRightUtilityButtonWithIndex:");
-    NSMutableArray* list = _downloadList;
-    NSIndexPath *indexPath = [_tableView indexPathForCell:cell];
-    if (indexPath && indexPath.row < [list count]) {
-        WspxDownloadItem* item = [list objectAtIndex:indexPath.row];
-        [self.downloadManager cancelDownloadWithItem:item];
-        [self.downloadManager removeDownloadWithItem:item];
-        
-        [list removeObject:item];
-        [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];
-        
-        //        [_hudManager showSuccessWithMessage:@"移除成功" duration:1];
-        //        _hudManager.HUD.minSize = CGSizeMake(100,100);
-        //        _hudManager.HUD.opacity = 0.6;
-        //        _hudManager.HUD.dimBackground = YES;
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickCellForDelete:)]) {
+        [_delegate downloadViewController:self didClickCellForDelete:cell];
     }
+    
+    __weak __typeof(self) weakSelf = self;
+    [self showAlertViewWithTitle:nil message:@"确定删除所选下载任务及其文件？" cancelTitle:@"取消" cancelAction:^{
+        if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:isComfirmToDeleteDownloads:)]) {
+            [_delegate downloadViewController:weakSelf isComfirmToDeleteDownloads:NO];
+        }
+    } confirmTitle:@"删除" confirmAction:^{
+        NSMutableArray* list = _downloadList;
+        NSIndexPath *indexPath = [_tableView indexPathForCell:cell];
+        if (indexPath && (indexPath.row < [list count])) {
+            WspxDownloadItem* item = [list objectAtIndex:indexPath.row];
+            [weakSelf.downloadManager cancelDownloadWithItem:item];
+            [weakSelf.downloadManager removeDownloadWithItem:item];
+            
+            [list removeObject:item];
+            [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+        }
+        if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:isComfirmToDeleteDownloads:)]) {
+            [_delegate downloadViewController:weakSelf isComfirmToDeleteDownloads:YES];
+        }
+    }];
 }
 
 #pragma mark - CustomDataSource and Delegate
@@ -493,7 +505,7 @@ UOneDownloadTableViewCellDelegate>
             case WspxDownloadItemStatusNotStarted:
             case WspxDownloadItemStatusError:
             case WspxDownloadItemStatusInterrupted:
-                [_downloadManager startDownloadWithItem:downloadItem];
+                [self handleStartDownload:downloadItem];
                 break;
             case WspxDownloadItemStatusCompleted:
                 if ([downloadItem.downloadErrorMessagesStack count] > 0) {
@@ -503,14 +515,35 @@ UOneDownloadTableViewCellDelegate>
                 break;
             case WspxDownloadItemStatusPending:
             case WspxDownloadItemStatusStarted:
-                [_downloadManager pauseDownloadWithItem:downloadItem];
+                [self handlePauseDownload:downloadItem];
                 break;
             case WspxDownloadItemStatusPaused:
-                [_downloadManager resumeDownloadWithItem:downloadItem];
+                [self handleResumeDownload:downloadItem];
                 break;
         }
     }
     
+}
+
+- (void)handleStartDownload:(WspxDownloadItem *)aDownloadItem {
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForStart:)]) {
+        [_delegate downloadViewController:self didClickDownloadItemForStart:aDownloadItem];
+    }
+    [_downloadManager startDownloadWithItem:aDownloadItem];
+}
+
+- (void)handlePauseDownload:(WspxDownloadItem *)aDownloadItem {
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForPause:)]) {
+        [_delegate downloadViewController:self didClickDownloadItemForPause:aDownloadItem];
+    }
+    [_downloadManager pauseDownloadWithItem:aDownloadItem];
+}
+
+- (void)handleResumeDownload:(WspxDownloadItem *)aDownloadItem {
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForResume:)]) {
+        [_delegate downloadViewController:self didClickDownloadItemForResume:aDownloadItem];
+    }
+    [_downloadManager resumeDownloadWithItem:aDownloadItem];
 }
 
 - (void)onSelected:(BOOL)selected tableViewCell:(UOneDownloadTableViewCell*)cell {
@@ -530,6 +563,11 @@ UOneDownloadTableViewCellDelegate>
 
 #pragma mark - UoneDownloadToolbarDelegate
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedEditButton:(UIButton *)button {
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickToolBarForEdit:)]) {
+        [_delegate downloadViewController:self didClickToolBarForEdit:toolbar];
+    }
+    
     [_selectedIndexSet removeAllIndexes];
     [self.tableView setEditing:_fileManagerToolbar.isEditing animated:YES];
     [self updateToolbarInterface];
@@ -537,12 +575,22 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDoneButton:(UIButton *)button {
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:DidClickToolBarForDone:)]) {
+        [_delegate downloadViewController:self DidClickToolBarForDone:toolbar];
+    }
+    
     [self.tableView setEditing:_fileManagerToolbar.isEditing animated:YES];
     [_selectedIndexSet removeAllIndexes];
     [self updateToolbarInterface];
 }
 
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedSelectAllButton:(UIButton *)button {
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:DidClickToolBarForSelectAll:)]) {
+        [_delegate downloadViewController:self DidClickToolBarForSelectAll:toolbar];
+    }
+    
     BOOL isSelectedAll = !button.selected;
     NSMutableArray* list = _downloadList;
     
@@ -557,11 +605,19 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDeleteButton:(UIButton *)button {
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:DidClickToolBarForDelete:)]) {
+        [_delegate downloadViewController:self DidClickToolBarForDelete:toolbar];
+    }
+    
     __weak __typeof(self) weakSelf = self;
     [self showAlertViewWithTitle:nil message:@"确定删除所选下载任务及其文件？" cancelTitle:@"取消" cancelAction:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf updateToolbarInterface];
             [weakSelf.fileManagerToolbar layout];
+            if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:isComfirmToDeleteDownloads:)]) {
+                [_delegate downloadViewController:weakSelf isComfirmToDeleteDownloads:NO];
+            }
         });
         NSLog(@"click cancelButton");
     } confirmTitle:@"删除" confirmAction:^{
@@ -582,8 +638,6 @@ UOneDownloadTableViewCellDelegate>
                         [indexPaths addObject:indexPath];
                     }
                 }
-                
-                
                 [_selectedIndexSet removeAllIndexes];
                 [weakSelf.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationLeft];
                 [weakSelf.tableView endUpdates];
@@ -592,8 +646,11 @@ UOneDownloadTableViewCellDelegate>
                 [weakSelf updateToolbarInterface];
                 [weakSelf.fileManagerToolbar layout];
             }
+            
+            if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:isComfirmToDeleteDownloads:)]) {
+                [_delegate downloadViewController:weakSelf isComfirmToDeleteDownloads:YES];
+            }
         });
-        NSLog(@"click confirmButton");
     }];
 }
 #pragma mark - Target-Action Event
@@ -651,7 +708,7 @@ UOneDownloadTableViewCellDelegate>
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:confirmTitle
-                                                                style:UIAlertActionStyleDestructive
+                                                                style:UIAlertActionStyleDefault
                                                               handler:^(UIAlertAction * _Nonnull action) {
                                                                   if (confirmBlock) {
                                                                       confirmBlock();

@@ -441,7 +441,8 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
             }
         }
         if (aChangedDownloadItem.expectedFileSizeInBytes > [self getFreeDiskspaceInBytes]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:aChangedDownloadItem];
+            [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
+            NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s", __PRETTY_FUNCTION__);
             [self pauseDownloadWithItem:aChangedDownloadItem];
         }
     }
@@ -533,7 +534,8 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 }
 
 - (void)downloadStorageAlmostFull {
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
+    NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s", __PRETTY_FUNCTION__);
 }
 #pragma mark - Persistence
 
