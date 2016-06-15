@@ -46,6 +46,7 @@ static PKStopDownloadButton *CommonInit(PKStopDownloadButton *self) {
     [self.stopButton setImage:[UIImage stopImageOfSize:stopButtonWidth
                                                  color:self.tintColor]
                      forState:UIControlStateNormal];
+    [self setRadius:stopButtonWidth/2];
     [self setNeedsDisplay];
 }
 

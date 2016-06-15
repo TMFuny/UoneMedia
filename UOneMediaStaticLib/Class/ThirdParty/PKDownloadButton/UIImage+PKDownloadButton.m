@@ -25,7 +25,7 @@
     UIGraphicsEndImageContext();
     return image;
 }
-
+//2个竖线
 + (UIImage *)downloadingImageOfSize:(CGFloat)size color:(UIColor *)color {
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0.0f);
     
@@ -43,7 +43,7 @@
     UIGraphicsEndImageContext();
     return downloadingImage;
 }
-
+//向下的箭头
 + (UIImage *)pauseImageOfSize:(CGFloat)size color:(UIColor *)color {
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0.0f);
     

@@ -96,7 +96,7 @@
     self.downloadButton.progressTrackColor = UIColorFromHex(0xffb72c);
     self.downloadButton.progressPendingColor = UIColorFromHex(0xbdbdbd);
     self.downloadButton.tintColor = UIColorFromHex(0xbdbdbd);
-    
+    self.downloadButton.progressImageWidth = 40;
     self.downloadButton.startDownloadTitle = @"下载";
     self.downloadButton.openDownloadedTitle = @"打开";
 }
@@ -105,6 +105,8 @@
     [super prepareForReuse];
     if (self.downloadButton.pendingView.isSpinning) {
         [self.downloadButton.pendingView startSpin];
+    } else {
+        [self.downloadButton.pendingView stopSpin];
     }
 }
 
@@ -122,6 +124,7 @@
         case WspxDownloadItemStatusCancelled:
         {
             //do nothing
+            self.downloadButton.state = kPKDownloadButtonState_StartDownload;
             break;
         }
         case WspxDownloadItemStatusPending:

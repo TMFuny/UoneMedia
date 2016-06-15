@@ -29,7 +29,7 @@
                         </connections>
                     </button>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="SiL-xB-iTo">
-                        <rect key="frame" x="8" y="17" width="40" height="40"/>
+                        <rect key="frame" x="16" y="17" width="40" height="40"/>
                         <color key="backgroundColor" red="0.11306401501440599" green="0.12519874490395" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="SiL-xB-iTo" secondAttribute="height" multiplier="1:1" id="pAz-xT-VTn"/>
@@ -37,7 +37,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="20v-RA-GwB" userLabel="Label1">
-                        <rect key="frame" x="56" y="16" width="208" height="21"/>
+                        <rect key="frame" x="64" y="16" width="200" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="ydP-dB-ekS"/>
                         </constraints>
@@ -46,7 +46,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HSi-Ik-ATa" userLabel="Label2">
-                        <rect key="frame" x="56" y="37" width="208" height="21"/>
+                        <rect key="frame" x="64" y="37" width="200" height="21"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="yPA-eI-mFx"/>
                         </constraints>
@@ -64,7 +64,7 @@
                     </view>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="leadingMargin" secondItem="SiL-xB-iTo" secondAttribute="leading" id="0DY-mR-Fra"/>
+                    <constraint firstAttribute="leadingMargin" secondItem="SiL-xB-iTo" secondAttribute="leading" constant="-8" id="0DY-mR-Fra"/>
                     <constraint firstAttribute="bottomMargin" secondItem="HSi-Ik-ATa" secondAttribute="bottom" constant="8" id="9hw-rB-fRm"/>
                     <constraint firstAttribute="topMargin" secondItem="20v-RA-GwB" secondAttribute="top" constant="-8" id="AlS-xM-bPk"/>
                     <constraint firstItem="25n-NF-QjA" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="CBB-Hw-SKY"/>

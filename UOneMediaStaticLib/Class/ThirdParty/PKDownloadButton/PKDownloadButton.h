@@ -53,7 +53,7 @@ IB_DESIGNABLE
 @property (nonatomic) IBInspectable UIColor *progressColor;
 @property (nonatomic) IBInspectable UIColor *progressTrackColor;
 @property (nonatomic) IBInspectable UIColor *progressPendingColor;
-
+@property (nonatomic) IBInspectable CGFloat progressImageWidth;
 @property (nonatomic, assign) PKDownloadButtonState state;
 
 @end

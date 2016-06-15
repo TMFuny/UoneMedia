@@ -208,14 +208,19 @@
         [self startDataTaskWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:aResumeData];
     } else {
         if (![self.deActiveDownloadsArray containsObject:aDownloadToken]) {
-            if (aRemoteURL) {
-                aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
+            if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_8_0) {
+                
+                if (aRemoteURL) {
+                    aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
+                }
+                aDownloadID = aDataTask.taskIdentifier;
+                aDataTask.taskDescription = aDownloadToken;
+                
+                [self.deActiveDownloadsArray addObject:aDownloadToken];
+                [aDataTask resume];
+            } else {
+                [self startDownloadWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:nil];
             }
-            aDownloadID = aDataTask.taskIdentifier;
-            aDataTask.taskDescription = aDownloadToken;
-            
-            [self.deActiveDownloadsArray addObject:aDownloadToken];
-            [aDataTask resume];
         } else {
             [self startDownloadWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:nil];
         }
@@ -767,12 +772,19 @@
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
-    if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
-        //TODO get the downloadItem from array.
-        if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
-            [self.fileDownloadDelegate downloadStorageAlmostFull];
+    if ([response expectedContentLength] != -1) {
+        if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
+        
+            if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
+                [self.fileDownloadDelegate downloadStorageAlmostFull];
+                NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [response expectedContentLength], [self getFreeDiskspaceInBytes], dataTask.originalRequest.URL, dataTask.taskDescription, response);
+            }
+        } else {
+            if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
+                [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
+            }
         }
-    } else {
+    } else {//不知道文件长度的也继续下载
         if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
             [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
         }

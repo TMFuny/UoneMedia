@@ -440,10 +440,13 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
                 aFileDownloadProgress.lastLocalizedAdditionalDescription = aFileDownloadProgress.nativeProgress.localizedAdditionalDescription;
             }
         }
-        if (aChangedDownloadItem.expectedFileSizeInBytes > [self getFreeDiskspaceInBytes]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
-            NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s", __PRETTY_FUNCTION__);
-            [self pauseDownloadWithItem:aChangedDownloadItem];
+        if (aChangedDownloadItem.expectedFileSizeInBytes != -1) {//不知道文件长度的也继续下载
+            
+            if (aChangedDownloadItem.expectedFileSizeInBytes > [self getFreeDiskspaceInBytes]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
+                NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu", __PRETTY_FUNCTION__, aChangedDownloadItem.expectedFileSizeInBytes, [self getFreeDiskspaceInBytes]);
+                [self pauseDownloadWithItem:aChangedDownloadItem];
+            }
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadProgressChangedNotification object:aChangedDownloadItem];
@@ -535,7 +538,6 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 
 - (void)downloadStorageAlmostFull {
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
-    NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s", __PRETTY_FUNCTION__);
 }
 #pragma mark - Persistence
 

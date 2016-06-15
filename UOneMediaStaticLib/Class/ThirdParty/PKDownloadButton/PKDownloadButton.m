@@ -150,7 +150,6 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
     _progressColor = progressColor;
     self.downloadingButton.progressColor = progressColor;
     self.pauseDownloadButton.progressColor = progressColor;
-    
     [self setNeedsDisplay];
 }
 
@@ -159,7 +158,15 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
     self.pendingView.circleView.strokeColor = progressPendingColor;
     [self setNeedsDisplay];
 }
-
+- (void)setProgressImageWidth:(CGFloat)progressImageWidth {
+    [self.pauseDownloadButton setPauseButtonWidth:progressImageWidth];
+    [self.downloadingButton setDownloadingButtonWidth:progressImageWidth];
+//    [self.downloadedButton se];
+//    [self.startDownloadButton set];
+    [self.pendingView setRadius:progressImageWidth / 2];
+    [self.stopDownloadButton setStopButtonWidth:progressImageWidth];
+    [self setNeedsDisplay];
+}
 #pragma mark - appearance
 
 - (void)updateButton:(UIButton *)button title:(NSString *)title {

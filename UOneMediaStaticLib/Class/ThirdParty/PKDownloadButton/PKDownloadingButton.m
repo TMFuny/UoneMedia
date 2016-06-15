@@ -40,11 +40,11 @@ static PKDownloadingButton *CommonInit(PKDownloadingButton *self) {
 
 
 #pragma mark - properties
-
-- (void)setPauseButtonWidth:(CGFloat)downloadingButtonWidth {
+-(void)setDownloadingButtonWidth:(CGFloat)downloadingButtonWidth {
     _downloadingButtonWidth = downloadingButtonWidth;
     [self.downloadingButton setImage:[UIImage downloadingImageOfSize:downloadingButtonWidth color:self.tintColor]
                       forState:UIControlStateNormal];
+    [self setRadius:downloadingButtonWidth/2];
     [self setNeedsDisplay];
 }
 
