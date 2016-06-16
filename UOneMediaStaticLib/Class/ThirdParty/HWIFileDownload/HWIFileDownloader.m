@@ -685,7 +685,7 @@
         }
         else
         {
-            aLocalDestinationFileURL = [HWIFileDownloader localFileURLForRemoteURL:aDownloadTask.originalRequest.URL];
+            aLocalDestinationFileURL = [HWIFileDownloader localFileURLForRemoteURL:aDownloadTask.originalRequest.URL withSuggestFilename:aDownloadItem.downloadSuggestedFileName];
         }
         if (aLocalDestinationFileURL)
         {
@@ -809,6 +809,10 @@
         }
         aDownloadItem.receivedFileSizeInBytes = aTotalBytesWrittenCount;
         aDownloadItem.expectedFileSizeInBytes = aTotalBytesExpectedToWriteCount;
+        NSString *suggesFileName = aDownloadTask.response.suggestedFilename;
+        if (suggesFileName && suggesFileName.length != 0) {
+            aDownloadItem.downloadSuggestedFileName = suggesFileName;
+        }
         if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressChangedForIdentifier:)])
         {
             NSString *aTaskDescription = [aDownloadTask.taskDescription copy];
@@ -972,7 +976,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
             }
             else
             {
-                aLocalFileURL = [HWIFileDownloader localFileURLForRemoteURL:aConnection.originalRequest.URL];
+                aLocalFileURL = [HWIFileDownloader localFileURLForRemoteURL:aConnection.originalRequest.URL withSuggestFilename:aDownloadItem.downloadSuggestedFileName];
             }
             
             if (aLocalFileURL)
@@ -1289,7 +1293,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
 #pragma mark - HWIFileDownloadDelegate Defaults
 
 
-+ (nullable NSURL *)localFileURLForRemoteURL:(nonnull NSURL *)aRemoteURL
++ (nullable NSURL *)localFileURLForRemoteURL:(nonnull NSURL *)aRemoteURL withSuggestFilename:(nullable NSString *)suggenstFilename
 {
     NSURL *aLocalFileURL = nil;
     NSURL *aFileDownloadDirectoryURL = nil;
@@ -1315,7 +1319,12 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
                 }
             }
         }
+
         NSString *aLocalFileName = [NSString stringWithFormat:@"%@.%@", [[NSUUID UUID] UUIDString], [[aRemoteURL lastPathComponent] pathExtension]];
+        if (suggenstFilename && suggenstFilename.length != 0) {
+
+            aLocalFileName = [NSString stringWithFormat:@"%@_%@", [[NSUUID UUID] UUIDString], suggenstFilename];
+        }
         aLocalFileURL = [aFileDownloadDirectoryURL URLByAppendingPathComponent:aLocalFileName isDirectory:NO];
     }
     return aLocalFileURL;
@@ -1410,6 +1419,21 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
     return aDownloadProgress;
 }
 
+- (nullable NSString *)downloadItemSuggestedFileNameForDownloadID:(nonnull NSString *)aDownloadIdentifier {
+    NSString *suggestedFileName = nil;
+    
+    NSInteger aDownloadID = [self downloadIDForActiveDownloadToken:aDownloadIdentifier];
+    if (aDownloadID > -1)
+    {
+        HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadID)];
+        
+        if (aDownloadItem) {
+            suggestedFileName = aDownloadItem.downloadSuggestedFileName;
+        }
+    }
+    
+    return suggestedFileName;
+}
 
 #pragma mark - Utilities
 
@@ -1514,5 +1538,6 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
     }
     return totalFreeSpace;
 }
+
 @end
 
