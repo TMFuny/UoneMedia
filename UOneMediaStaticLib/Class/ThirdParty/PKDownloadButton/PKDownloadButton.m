@@ -163,7 +163,7 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
     [self.downloadingButton setDownloadingButtonWidth:progressImageWidth];
 //    [self.downloadedButton se];
 //    [self.startDownloadButton set];
-    [self.pendingView setRadius:progressImageWidth / 2];
+    [self.pendingView setRadius:progressImageWidth];
     [self.stopDownloadButton setStopButtonWidth:progressImageWidth];
     [self setNeedsDisplay];
 }

@@ -29,6 +29,7 @@
     {
         self.downloadIdentifier = aDownloadIdentifier;
         self.remoteURL = aRemoteURL;
+        self.downloadSuggestedFileName = nil;
         self.localFileURL = nil;
         self.status = WspxDownloadItemStatusNotStarted;
         self.lastUpdateTime = nil;
@@ -43,6 +44,9 @@
     [aCoder encodeObject:self.remoteURL forKey:@"remoteURL"];
     [aCoder encodeObject:self.localFileURL forKey:@"localFileURL"];
     [aCoder encodeObject:@(self.status) forKey:@"status"];
+    if (self.downloadSuggestedFileName) {
+        [aCoder encodeObject:self.downloadSuggestedFileName forKey:@"downloadSuggestedFileName"];
+    }
     if (self.resumeData.length > 0)
     {
         [aCoder encodeObject:self.resumeData forKey:@"resumeData"];
@@ -72,6 +76,7 @@
         self.downloadIdentifier = [aCoder decodeObjectForKey:@"downloadIdentifier"];
         self.remoteURL = [aCoder decodeObjectForKey:@"remoteURL"];
         self.localFileURL = [aCoder decodeObjectForKey:@"localFileURL"];
+        self.downloadSuggestedFileName = [aCoder decodeObjectForKey:@"downloadSuggestedFileName"];
         self.status = [[aCoder decodeObjectForKey:@"status"] unsignedIntegerValue];
         self.resumeData = [aCoder decodeObjectForKey:@"resumeData"];
         self.progress = [aCoder decodeObjectForKey:@"progress"];
@@ -89,6 +94,9 @@
     NSMutableDictionary *aDescriptionDict = [NSMutableDictionary dictionary];
     [aDescriptionDict setObject:self.downloadIdentifier forKey:@"downloadIdentifier"];
     [aDescriptionDict setObject:self.remoteURL forKey:@"remoteURL"];
+    if (self.downloadSuggestedFileName) {
+        [aDescriptionDict setObject:self.downloadSuggestedFileName forKey:@"downloadSuggestedFileName"];
+    }
     if (self.localFileURL) {
         [aDescriptionDict setObject:self.localFileURL forKey:@"localFileURL"];
     }

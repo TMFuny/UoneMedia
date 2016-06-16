@@ -165,8 +165,8 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
             [self storeDownloadItems];
             
             // kick off individual download
-            if (aDownloadItem.resumeData.length > 0)
-            {
+            if ([self isValidResumeData:aDownloadItem.resumeData]) {
+                
                 [_fileDownloader startDownloadWithIdentifier:aDownloadItem.downloadIdentifier usingResumeData:aDownloadItem.resumeData];
             }
             else
@@ -430,6 +430,9 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
             aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
         }
         
+        if (!aChangedDownloadItem.downloadSuggestedFileName) {
+            aChangedDownloadItem.downloadSuggestedFileName = [_fileDownloader downloadItemSuggestedFileNameForDownloadID:aDownloadIdentifier];
+        }
         HWIFileDownloadProgress *aFileDownloadProgress = [_fileDownloader downloadProgressForIdentifier:aDownloadIdentifier];
         if (aFileDownloadProgress)
         {
@@ -616,4 +619,20 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     return [self.fileDownloader getFreeDiskspaceInBytes];
 }
 
+/* * * *
+ *       every time you run xcode it will change path of the document.
+ *       http://stackoverflow.com/questions/21895853/how-can-i-check-that-an-nsdata-blob-is-valid-as-resumedata-for-an-nsurlsessiondo
+ * * * */
+- (BOOL)isValidResumeData:(NSData *)data{
+    if (!data || [data length] < 1) return NO;
+    
+    NSError *error;
+    NSDictionary *resumeDictionary = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];
+    if (!resumeDictionary || error) return NO;
+    
+    NSString *localFilePath = [resumeDictionary objectForKey:@"NSURLSessionResumeInfoLocalPath"];
+    if ([localFilePath length] < 1) return NO;
+    
+    return [[NSFileManager defaultManager] fileExistsAtPath:localFilePath];
+}
 @end

@@ -45,7 +45,7 @@ static PKPauseDownloadButton *CommonInit(PKPauseDownloadButton *self) {
     _pauseButtonWidth = pauseButtonWidth;
     [self.pauseButton setImage:[UIImage pauseImageOfSize:pauseButtonWidth color:self.tintColor]
                       forState:UIControlStateNormal];
-    [self setRadius:pauseButtonWidth/2];
+    [self setRadius:pauseButtonWidth];
     [self setNeedsDisplay];
 }
 

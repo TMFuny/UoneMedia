@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[WspxDownloadManager startDownloadWithItem:]:WspxDownloadManager.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "(__NSCFData *)aDownloadItem-&gt;_resumeData">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[HWIFileDownloader startDownloadWithIdentifier:usingResumeData:]:HWIFileDownloader.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[WspxDownloadManager resumeDownloadWithItem:]:WspxDownloadManager.m">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

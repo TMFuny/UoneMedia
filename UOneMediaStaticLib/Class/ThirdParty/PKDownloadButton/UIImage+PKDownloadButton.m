@@ -30,11 +30,20 @@
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0.0f);
     
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextMoveToPoint(context, 1, 0);
-    CGContextAddLineToPoint(context, 1, size);
-    
-    CGContextMoveToPoint(context, size-1, 0);
-    CGContextAddLineToPoint(context, size-1, size);
+    if (size<= 8) {
+        CGContextMoveToPoint(context, 1, 0);
+        CGContextAddLineToPoint(context, 1, size);
+
+        CGContextMoveToPoint(context, size-1, 0);
+        CGContextAddLineToPoint(context, size-1, size);
+    } else {
+        
+        CGContextMoveToPoint(context, size*2/3, size/4);
+        CGContextAddLineToPoint(context, size*2/3, size*3/4);
+        
+        CGContextMoveToPoint(context, size/3, size/4);
+        CGContextAddLineToPoint(context, size/3, size*3/4);
+    }
     
     CGContextSetStrokeColorWithColor(context, color.CGColor);
     CGContextStrokePath(context);
@@ -48,14 +57,26 @@
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0.0f);
     
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextMoveToPoint(context, size/2, 0);
-    CGContextAddLineToPoint(context, size/2, size);
-    
-    CGContextMoveToPoint(context, size/2, size);
-    CGContextAddLineToPoint(context, 0,size/2);
-    
-    CGContextMoveToPoint(context, size/2, size);
-    CGContextAddLineToPoint(context, size, size/2);
+    if (size <= 8) {
+        CGContextMoveToPoint(context, size/2, 0);
+        CGContextAddLineToPoint(context, size/2, size);
+        
+        CGContextMoveToPoint(context, size/2, size);
+        CGContextAddLineToPoint(context, 0,size/2);
+        
+        CGContextMoveToPoint(context, size/2, size);
+        CGContextAddLineToPoint(context, size, size/2);
+
+    } else {
+        CGContextMoveToPoint(context, size/2, size/4);
+        CGContextAddLineToPoint(context, size/2, size*3/4);
+        //left
+        CGContextMoveToPoint(context, size/2, size*3/4);
+        CGContextAddLineToPoint(context, size/4,size/2);
+        //right
+        CGContextMoveToPoint(context, size/2, size*3/4);
+        CGContextAddLineToPoint(context, size*3/4, size/2);
+    }
     
     CGContextSetStrokeColorWithColor(context, color.CGColor);
     CGContextStrokePath(context);

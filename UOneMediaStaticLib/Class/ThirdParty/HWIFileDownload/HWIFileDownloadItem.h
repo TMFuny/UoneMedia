@@ -47,6 +47,7 @@
 
 
 @property (nonatomic, strong, nullable) NSDate *downloadStartDate;
+@property (nonatomic, strong, nullable) NSString *downloadSuggestedFileName;
 @property (nonatomic, assign) int64_t receivedFileSizeInBytes;
 @property (nonatomic, assign) int64_t expectedFileSizeInBytes;
 @property (nonatomic, assign) int64_t resumedFileSizeInBytes;

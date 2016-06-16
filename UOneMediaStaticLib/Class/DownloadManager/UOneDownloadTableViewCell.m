@@ -96,7 +96,7 @@
     self.downloadButton.progressTrackColor = UIColorFromHex(0xffb72c);
     self.downloadButton.progressPendingColor = UIColorFromHex(0xbdbdbd);
     self.downloadButton.tintColor = UIColorFromHex(0xbdbdbd);
-    self.downloadButton.progressImageWidth = 40;
+    self.downloadButton.progressImageWidth = 20;
     self.downloadButton.startDownloadTitle = @"下载";
     self.downloadButton.openDownloadedTitle = @"打开";
 }
@@ -111,9 +111,13 @@
 }
 
 - (void)resetWithDownloadItem : ( WspxDownloadItem * _Nonnull )aDownloadItem {
-    self.fileLabel.text = [self splitFilenameFromUrl:aDownloadItem.remoteURL.path];
+    if (aDownloadItem.downloadSuggestedFileName && [aDownloadItem.downloadSuggestedFileName length] != 0) {
+        self.fileLabel.text = aDownloadItem.downloadSuggestedFileName;
+    } else {
+        self.fileLabel.text = [self splitFilenameFromUrl:aDownloadItem.remoteURL.path];
+    }
     
-   NSMutableString *sizeString = [[self jointWithExpectedSize: _downloadItem.expectedFileSizeInBytes receivedSize:_downloadItem.receivedFileSizeInBytes] mutableCopy];
+   NSMutableString *sizeString = [[self jointWithExpectedSize: aDownloadItem.expectedFileSizeInBytes receivedSize:aDownloadItem.receivedFileSizeInBytes] mutableCopy];
     self.iconImage.image = [self imageWithFileExt:[self splitExtFromFilename: self.fileLabel.text]];
    
     CGFloat progress = aDownloadItem.downloadProgress;
@@ -133,6 +137,7 @@
             self.downloadButton.state = kPKDownloadButtonState_Pending;
             break;
         }
+        case WspxDownloadItemStatusInterrupted:
         case WspxDownloadItemStatusError:
         {
             self.downloadButton.state = kPKDownloadButtonState_Error;
@@ -149,13 +154,13 @@
         case WspxDownloadItemStatusStarted:
         {
             [sizeString appendString:@" | "];
-            [sizeString appendString:[self toStringWithBytesPerSecond:_downloadItem.bytesPerSecondSpeed]];
+            [sizeString appendString:[self toStringWithBytesPerSecond:aDownloadItem.bytesPerSecondSpeed]];
             self.downloadButton.state = kPKDownloadButtonState_Downloading;
             self.downloadButton.pauseDownloadButton.pkProgress = progress;
             self.downloadButton.downloadingButton.pkProgress = progress;
             break;
         }
-        case WspxDownloadItemStatusInterrupted:
+        
         case WspxDownloadItemStatusPaused:
         {
             [sizeString appendString:@" | 已暂停"];

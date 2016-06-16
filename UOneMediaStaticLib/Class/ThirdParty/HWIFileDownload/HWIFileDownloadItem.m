@@ -58,6 +58,7 @@
     if (self)
     {
         self.downloadToken = aDownloadToken;
+        self.downloadSuggestedFileName = nil;
         self.sessionDownloadTask = aSessionDownloadTask;
         self.urlConnection = aURLConnection;
         self.receivedFileSizeInBytes = 0;
@@ -123,6 +124,10 @@
     [aDescriptionDict setObject:@(self.bytesPerSecondSpeed) forKey:@"bytesPerSecondSpeed"];
     [aDescriptionDict setObject:self.downloadToken forKey:@"downloadToken"];
     [aDescriptionDict setObject:self.progress forKey:@"progress"];
+    
+    if (self.downloadSuggestedFileName) {
+        [aDescriptionDict setObject:self.downloadSuggestedFileName forKey:@"downloadSuggestedFileName"];
+    }
     if (self.sessionDownloadTask)
     {
         [aDescriptionDict setObject:@(YES) forKey:@"hasSessionDownloadTask"];
