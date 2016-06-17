@@ -536,7 +536,13 @@ UOneDownloadTableViewCellDelegate>
     if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForPause:)]) {
         [_delegate downloadViewController:self didClickDownloadItemForPause:aDownloadItem];
     }
-    [_downloadManager pauseDownloadWithItem:aDownloadItem];
+    if (_dataSource && [_dataSource respondsToSelector:@selector(downloadViewController:shouldPauseForDownloadItem:)]) {
+        if ([_dataSource downloadViewController:self shouldPauseForDownloadItem:aDownloadItem]) {
+            [_downloadManager pauseDownloadWithItem:aDownloadItem];
+        }
+    } else {
+        [_downloadManager pauseDownloadWithItem:aDownloadItem];
+    }
 }
 
 - (void)handleResumeDownload:(WspxDownloadItem *)aDownloadItem {
@@ -673,19 +679,15 @@ UOneDownloadTableViewCellDelegate>
 
 - (void) deleteDownloadItemOfDownloadManager {
     if (_deleteList && [_deleteList count] != 0) {
-        
-        if ([_deleteList count] == [_downloadList count]) {
-            [self.downloadManager cancelAllDownloadItems];
-            [self.downloadManager removeAllDownloadItems];
-            return;
-        }
-        
+    
         NSArray *downloadItems = [[self.downloadManager downloadItems] copy];
         for (WspxDownloadItem *item1 in _deleteList) {
             if (downloadItems && [downloadItems count] != 0) {
                 for (WspxDownloadItem *item2 in downloadItems) {
                     if ([item2.downloadIdentifier isEqualToString:item1.downloadIdentifier]) {
-                        [self.downloadManager cancelDownloadWithItem:item2];
+                        if (item2.status != WspxDownloadItemStatusCompleted) {
+                            [self.downloadManager cancelDownloadWithItem:item2];
+                        }
                         [self.downloadManager removeDownloadWithItem:item2];
                     }
                 }

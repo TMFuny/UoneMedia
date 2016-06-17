@@ -222,18 +222,10 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 }
 
 - (void)cancelAllDownloadItems {
-    for(WspxDownloadItem* item in self.downloadItems) {
-        BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:item.downloadIdentifier];
-        if (isDownloading) {
-            if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1) {
-                HWIFileDownloadProgress *aFileDownloadProgress = [_fileDownloader downloadProgressForIdentifier:item.downloadIdentifier];
-                [aFileDownloadProgress.nativeProgress cancel];
-            } else {
-                [_fileDownloader cancelDownloadWithIdentifier:item.downloadIdentifier];
-            }
-        } else {
-            item.status = WspxDownloadItemStatusCancelled;
-            [self storeDownloadItems];
+    NSArray* allItems = [self.downloadItems copy];
+    for(WspxDownloadItem* item in allItems) {
+        if (item.status != WspxDownloadItemStatusCompleted) {
+            [self cancelDownloadWithItem:item];
         }
     }
 }
@@ -283,7 +275,17 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 
     BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:aRemoveDownloadItem.downloadIdentifier];
     if (!isDownloading) {
+            
+        if ([[NSFileManager defaultManager] fileExistsAtPath:aRemoveDownloadItem.localFileURL.path] && [[NSFileManager defaultManager] isDeletableFileAtPath:aRemoveDownloadItem.localFileURL.path]) {
+            NSError* aRemoveError = nil;
+            [[NSFileManager defaultManager] removeItemAtPath:aRemoveDownloadItem.localFileURL.path error:&aRemoveError];
+            
+            if (aRemoveError) {
+                NSLog(@"ERR: Unable to remove file at %@: %@ (%@, %d)", aRemoveDownloadItem.localFileURL, aRemoveError.localizedDescription, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+            }
+        }
         [self.downloadItems removeObject:aRemoveDownloadItem];
+        
     } else {
         NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {
             if ([aRemoveDownloadItem.downloadIdentifier isEqualToString:aDownloadItem.downloadIdentifier]) {
@@ -425,7 +427,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     if (aFoundDownloadItemIndex != NSNotFound)
     {
         aChangedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
-        if (aChangedDownloadItem.status = WspxDownloadItemStatusPending)
+        if (aChangedDownloadItem.status == WspxDownloadItemStatusPending)
         {
             aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
         }
@@ -443,6 +445,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
                 aFileDownloadProgress.lastLocalizedAdditionalDescription = aFileDownloadProgress.nativeProgress.localizedAdditionalDescription;
             }
         }
+        aChangedDownloadItem.isSupportResumeWithoutRestart = [_fileDownloader isSupportResumeWithoutRestartForDownloadID:aDownloadIdentifier];
         if (aChangedDownloadItem.expectedFileSizeInBytes != -1) {//不知道文件长度的也继续下载
             
             if (aChangedDownloadItem.expectedFileSizeInBytes > [self getFreeDiskspaceInBytes]) {
@@ -495,7 +498,6 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         [self startDownloadWithItem:aDemoDownloadItem];
     }
 }
-
 
 - (BOOL)downloadAtLocalFileURL:(nonnull NSURL *)aLocalFileURL isValidForDownloadIdentifier:(nonnull NSString *)aDownloadIdentifier
 {
@@ -615,6 +617,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     return [NSString stringWithFormat:@"可用%@GB/共%@GB",totalFreeSpaceString, totalSpaceString];
 }
 
+#pragma mark -DeviceStorageUtil
 - (uint64_t)getFreeDiskspaceInBytes {
     return [self.fileDownloader getFreeDiskspaceInBytes];
 }

@@ -31,6 +31,7 @@
         self.remoteURL = aRemoteURL;
         self.downloadSuggestedFileName = nil;
         self.localFileURL = nil;
+        self.isSupportResumeWithoutRestart = NO;
         self.status = WspxDownloadItemStatusNotStarted;
         self.lastUpdateTime = nil;
     }
@@ -44,6 +45,7 @@
     [aCoder encodeObject:self.remoteURL forKey:@"remoteURL"];
     [aCoder encodeObject:self.localFileURL forKey:@"localFileURL"];
     [aCoder encodeObject:@(self.status) forKey:@"status"];
+    [aCoder encodeBool:self.isSupportResumeWithoutRestart forKey:@"isSupportResumeWithoutRestart"];
     if (self.downloadSuggestedFileName) {
         [aCoder encodeObject:self.downloadSuggestedFileName forKey:@"downloadSuggestedFileName"];
     }
@@ -78,6 +80,7 @@
         self.localFileURL = [aCoder decodeObjectForKey:@"localFileURL"];
         self.downloadSuggestedFileName = [aCoder decodeObjectForKey:@"downloadSuggestedFileName"];
         self.status = [[aCoder decodeObjectForKey:@"status"] unsignedIntegerValue];
+        self.isSupportResumeWithoutRestart = [aCoder decodeBoolForKey:@"isSupportResumeWithoutRestart"];
         self.resumeData = [aCoder decodeObjectForKey:@"resumeData"];
         self.progress = [aCoder decodeObjectForKey:@"progress"];
         self.downloadError = [aCoder decodeObjectForKey:@"downloadError"];
@@ -101,6 +104,7 @@
         [aDescriptionDict setObject:self.localFileURL forKey:@"localFileURL"];
     }
     [aDescriptionDict setObject:@(self.status) forKey:@"status"];
+    [aDescriptionDict setObject:self.isSupportResumeWithoutRestart?@"YES":@"NO" forKey:@"isSupportResumeWithoutRestart"];
     if (self.progress)
     {
         [aDescriptionDict setObject:self.progress forKey:@"progress"];

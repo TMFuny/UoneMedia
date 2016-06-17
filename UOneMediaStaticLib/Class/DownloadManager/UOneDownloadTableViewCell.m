@@ -327,9 +327,9 @@ static NSDictionary *staticExtImageMap = nil;
 - (NSDictionary*)getDoucmentTypeMap {
     
     NSString *pictureString = @"jpg、jpeg、png、bmp、gif";
-    NSString *documentString = @"txt、doc、docx、ppt、pptx、xls、xlsx、pdf";
-    NSString *videoString = @"avi、rmvb、rm、asf、divx、mpg、mpeg、mpe、wmv、mp4、mkv、vob";
-    NSString *audioString = @"mp3、wma、wav";
+    NSString *documentString = @"txt、doc、docx、ppt、pptx、xls、xlsx、pdf、mobi、epub";
+    NSString *videoString = @"avi、rmvb、rm、asf、divx、mpg、mpeg、mpe、wmv、mp4、mkv、vob、mov、swf";
+    NSString *audioString = @"mp3、wma、wav、ram、amr、au";
     NSString *zipString = @"rar、zip";
     
     

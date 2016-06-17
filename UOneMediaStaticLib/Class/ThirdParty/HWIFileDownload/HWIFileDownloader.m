@@ -203,31 +203,51 @@
                          fromRemoteURL:(nullable NSURL *)aRemoteURL
                        usingResumeData:(nullable NSData *)aResumeData {
     NSUInteger aDownloadID = 0;
-    NSURLSessionDataTask *aDataTask = nil;
+    
     if (aResumeData) {
         [self startDataTaskWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:aResumeData];
     } else {
         if (![self.deActiveDownloadsArray containsObject:aDownloadToken]) {
-            if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_8_0) {
-                
-                if (aRemoteURL) {
-                    aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
-                }
-                aDownloadID = aDataTask.taskIdentifier;
-                aDataTask.taskDescription = aDownloadToken;
-                
-                [self.deActiveDownloadsArray addObject:aDownloadToken];
-                [aDataTask resume];
-            } else {
-                [self startDownloadWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:nil];
-            }
+            [self resumDataTaskWithRemoteURL:aRemoteURL downloadID:aDownloadID DownloadToken:aDownloadToken];
         } else {
             [self startDownloadWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:nil];
         }
-        
     }
+}
+
+- (void)resumDataTaskWithRemoteURL:(NSURL*)aRemoteURL downloadID:(NSUInteger)aDownloadID DownloadToken:(nonnull NSString *)aDownloadToken {
+    NSURLSessionDataTask *aDataTask = nil;
+    if (aRemoteURL) {
+        if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_8_0) {
+            aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
+        } else {
+            aDataTask = [[NSURLSession sharedSession] dataTaskWithURL:aRemoteURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if ([response expectedContentLength] != -1) {
+                    if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
+                        
+                        if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
+                            [self.fileDownloadDelegate downloadStorageAlmostFull];
+                            NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [response expectedContentLength], [self getFreeDiskspaceInBytes], aRemoteURL, aDownloadToken, response);
+                        }
+                    } else {
+                        if ([self.deActiveDownloadsArray containsObject:aDownloadToken]) {
+                            [self startDownloadWithIdentifier:aDownloadToken fromRemoteURL:aRemoteURL];
+                        }
+                    }
+                } else {//不知道文件长度的也继续下载
+                    if ([self.deActiveDownloadsArray containsObject:aDownloadToken]) {
+                        [self startDownloadWithIdentifier:aDownloadToken fromRemoteURL:aRemoteURL];
+                    }
+                }
+                
+            }];
+        }
+    }
+    aDownloadID = aDataTask.taskIdentifier;
+    aDataTask.taskDescription = aDownloadToken;
     
-    
+    [self.deActiveDownloadsArray addObject:aDownloadToken];
+    [aDataTask resume];
 }
 
 - (void)startDownloadWithDownloadToken:(nonnull NSString *)aDownloadToken
@@ -658,6 +678,35 @@
 
 
 #pragma mark - NSURLSession
+
+#pragma mark - NSURLSessionDataDelegate
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+    if ([response expectedContentLength] != -1) {
+        if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
+            
+            if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
+                [self.fileDownloadDelegate downloadStorageAlmostFull];
+                NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [response expectedContentLength], [self getFreeDiskspaceInBytes], dataTask.originalRequest.URL, dataTask.taskDescription, response);
+            }
+        } else {
+            if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
+                [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
+            }
+        }
+    } else {//不知道文件长度的也继续下载
+        if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
+            [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
+        }
+    }
+    
+    
+    HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(dataTask.taskIdentifier)];
+    if (aDownloadItem)
+    {
+    }
+}
+
 #pragma mark - NSURLSessionDownloadDelegate
 
 
@@ -685,7 +734,7 @@
         }
         else
         {
-            aLocalDestinationFileURL = [HWIFileDownloader localFileURLForRemoteURL:aDownloadTask.originalRequest.URL withSuggestFilename:aDownloadItem.downloadSuggestedFileName];
+            aLocalDestinationFileURL = [HWIFileDownloader localFileURLForRemoteURL:aDownloadTask.originalRequest.URL];
         }
         if (aLocalDestinationFileURL)
         {
@@ -770,34 +819,6 @@
     }
 }
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
-    didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
-    if ([response expectedContentLength] != -1) {
-        if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
-        
-            if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
-                [self.fileDownloadDelegate downloadStorageAlmostFull];
-                NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [response expectedContentLength], [self getFreeDiskspaceInBytes], dataTask.originalRequest.URL, dataTask.taskDescription, response);
-            }
-        } else {
-            if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
-                [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
-            }
-        }
-    } else {//不知道文件长度的也继续下载
-        if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
-            [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
-        }
-    }
-
-    
-    HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(dataTask.taskIdentifier)];
-    if (aDownloadItem)
-    {
-    
-    }
-}
-
 - (void)URLSession:(nonnull NSURLSession *)aSession downloadTask:(nonnull NSURLSessionDownloadTask *)aDownloadTask didWriteData:(int64_t)aBytesWrittenCount totalBytesWritten:(int64_t)aTotalBytesWrittenCount totalBytesExpectedToWrite:(int64_t)aTotalBytesExpectedToWriteCount
 {
     HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadTask.taskIdentifier)];
@@ -806,6 +827,22 @@
         if (aDownloadItem.downloadStartDate == nil)
         {
             aDownloadItem.downloadStartDate = [NSDate date];
+        }
+       
+        if ([aDownloadTask.response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
+            NSDictionary * headlerFields = [httpResponse allHeaderFields];
+            NSString *cacheControl = nil;
+            NSLog(@"headerFields:%@", headlerFields);
+            cacheControl = [headlerFields objectForKey:@"Cache-Control"];
+            if (!cacheControl) {
+                cacheControl = [headlerFields objectForKey:@"Cache-Controli"];
+            }
+            if ([cacheControl isEqualToString:@"public"]) {
+                aDownloadItem.isSupportResumeWithoutRestart = YES;
+            }
+        } else {
+            aDownloadItem.isSupportResumeWithoutRestart = NO;
         }
         aDownloadItem.receivedFileSizeInBytes = aTotalBytesWrittenCount;
         aDownloadItem.expectedFileSizeInBytes = aTotalBytesExpectedToWriteCount;
@@ -976,7 +1013,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
             }
             else
             {
-                aLocalFileURL = [HWIFileDownloader localFileURLForRemoteURL:aConnection.originalRequest.URL withSuggestFilename:aDownloadItem.downloadSuggestedFileName];
+                aLocalFileURL = [HWIFileDownloader localFileURLForRemoteURL:aConnection.originalRequest.URL];
             }
             
             if (aLocalFileURL)
@@ -1293,7 +1330,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
 #pragma mark - HWIFileDownloadDelegate Defaults
 
 
-+ (nullable NSURL *)localFileURLForRemoteURL:(nonnull NSURL *)aRemoteURL withSuggestFilename:(nullable NSString *)suggenstFilename
++ (nullable NSURL *)localFileURLForRemoteURL:(nonnull NSURL *)aRemoteURL
 {
     NSURL *aLocalFileURL = nil;
     NSURL *aFileDownloadDirectoryURL = nil;
@@ -1319,12 +1356,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
                 }
             }
         }
-
         NSString *aLocalFileName = [NSString stringWithFormat:@"%@.%@", [[NSUUID UUID] UUIDString], [[aRemoteURL lastPathComponent] pathExtension]];
-        if (suggenstFilename && suggenstFilename.length != 0) {
-
-            aLocalFileName = [NSString stringWithFormat:@"%@_%@", [[NSUUID UUID] UUIDString], suggenstFilename];
-        }
         aLocalFileURL = [aFileDownloadDirectoryURL URLByAppendingPathComponent:aLocalFileName isDirectory:NO];
     }
     return aLocalFileURL;
@@ -1435,6 +1467,21 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
     return suggestedFileName;
 }
 
+- (BOOL)isSupportResumeWithoutRestartForDownloadID:(nonnull NSString *)aDownloadIdentifier {
+    BOOL isSupportResumeWithoutRestart = NO;
+    
+    NSInteger aDownloadID = [self downloadIDForActiveDownloadToken:aDownloadIdentifier];
+    if (aDownloadID > -1)
+    {
+        HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadID)];
+        
+        if (aDownloadItem) {
+            isSupportResumeWithoutRestart = aDownloadItem.isSupportResumeWithoutRestart;
+        }
+    }
+    
+    return isSupportResumeWithoutRestart;
+}
 #pragma mark - Utilities
 
 

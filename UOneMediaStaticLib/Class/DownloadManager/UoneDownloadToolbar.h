@@ -10,10 +10,10 @@
 @class UoneDownloadToolbar;
 @protocol UoneDownloadToolbarDelegate <NSObject>
 
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar*)toolbar didClickedEditButton:(UIButton*)button;
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar*)toolbar didClickedDoneButton:(UIButton*)button;
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar*)toolbar didClickedSelectAllButton:(UIButton*)button;
-- (void)uoneDownloadToolbar:(UoneDownloadToolbar*)toolbar didClickedDeleteButton:(UIButton*)button;
+- (void)uoneDownloadToolbar:(nonnull UoneDownloadToolbar*)toolbar didClickedEditButton:(nonnull UIButton*)button;
+- (void)uoneDownloadToolbar:(nonnull UoneDownloadToolbar*)toolbar didClickedDoneButton:(nonnull UIButton*)button;
+- (void)uoneDownloadToolbar:(nonnull UoneDownloadToolbar*)toolbar didClickedSelectAllButton:(nonnull UIButton*)button;
+- (void)uoneDownloadToolbar:(nonnull UoneDownloadToolbar*)toolbar didClickedDeleteButton:(nonnull UIButton*)button;
 
 @end
 

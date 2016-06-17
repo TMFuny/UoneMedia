@@ -165,6 +165,13 @@ typedef void (^HWIFileDownloaderPauseResumeDataBlock)(NSData * _Nullable aResume
  @return downloadItem suggestedFilename.
  */
 - (nullable NSString *)downloadItemSuggestedFileNameForDownloadID:(nonnull NSString *)aDownloadIdentifier;
+#pragma mark - downloadItemIsSupportResumeWithoutRestart
+/**
+ Returns downloadItem isSupportResumeWithoutRestart for a download item.
+ @param aDownloadIdentifier Download identifier of the download item.
+ @return downloadItem isSupportResumeWithoutRestart.
+ */
+- (BOOL)isSupportResumeWithoutRestartForDownloadID:(nonnull NSString *)aDownloadIdentifier;
 #pragma mark - FileSystemFreeSize
 /**
  get the device fileSystemFreeSize

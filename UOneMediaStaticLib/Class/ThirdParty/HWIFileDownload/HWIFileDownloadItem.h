@@ -62,7 +62,7 @@
 @property (nonatomic, strong, nullable) NSArray<NSString *> *errorMessagesStack;
 @property (nonatomic, assign) NSInteger lastHttpStatusCode;
 @property (nonatomic, strong, nullable) NSURL *finalLocalFileURL;
-
+@property (nonatomic, assign) BOOL isSupportResumeWithoutRestart;
 
 - (nullable HWIFileDownloadItem *)init __attribute__((unavailable("use initWithDownloadToken:sessionDownloadTask:urlConnection:")));
 + (nullable HWIFileDownloadItem *)new __attribute__((unavailable("use initWithDownloadToken:sessionDownloadTask:urlConnection:")));

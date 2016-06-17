@@ -36,12 +36,23 @@
 
 @end
 
+@protocol UoneDownloadViewControllerDataSource <NSObject>
+
+@optional
+// -downloadViewController:shouldPauseForDownloadItem: is called when a pause touch comes down on a downloadItem.
+// Returning NO to do nothing
+//          YES to pause current downloadItem.
+- (BOOL)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController shouldPauseForDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem; //是否需要暂停
+
+@end
+
 @interface UOneDownloadViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UOneDownloadTableViewCellDelegate>
 
 @property (nonnull, nonatomic, strong) IBOutlet UITableView* tableView;
 @property (nonnull, nonatomic, strong) IBOutlet UoneDownloadToolbar *fileManagerToolbar;
 @property (nonnull, nonatomic, strong) WspxDownloadManager* downloadManager;
 @property (nullable, assign) id <UoneDownloadViewControllerDelegate> delegate;
+@property (nullable, assign) id <UoneDownloadViewControllerDataSource> dataSource;
 - (void)presentOptionsMenu;
 - (void)showAlertViewWithTitle:(nullable NSString*)title
                        message:(nullable NSString*)message

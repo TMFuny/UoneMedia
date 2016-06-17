@@ -36,27 +36,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487756849.201196"
+            timestampString = "487842848.048211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "778"
-            endingLineNumber = "778"
-            landmarkName = "-URLSession:dataTask:didReceiveResponse:completionHandler:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487755663.434098"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "636"
-            endingLineNumber = "636"
+            startingLineNumber = "656"
+            endingLineNumber = "656"
             landmarkName = "-tempLocalFileURLForDownloadFromURL:"
             landmarkType = "5">
          </BreakpointContent>
@@ -68,59 +52,43 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487756849.201196"
+            timestampString = "487842848.048211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "968"
-            endingLineNumber = "968"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "-connectionDidFinishLoading:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487756849.201196"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1171"
-            endingLineNumber = "1171"
-            landmarkName = "-connection:didReceiveData:"
             landmarkType = "5">
             <Locations>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "-[HWIFileDownloader connection:didReceiveData:]"
+                  symbolName = "__48-[HWIFileDownloader connectionDidFinishLoading:]_block_invoke"
                   moduleName = "UOneMediaApp"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenshilong/Documents/WS/Uone/iOS_UOne/iOS_UOneMedia/trunk/UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-                  timestampString = "487760710.562106"
+                  timestampString = "487845251.113762"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1172"
-                  endingLineNumber = "1172"
-                  offsetFromSymbolStart = "420">
+                  startingLineNumber = "1036"
+                  endingLineNumber = "1036"
+                  offsetFromSymbolStart = "1176">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "__47-[HWIFileDownloader connection:didReceiveData:]_block_invoke"
+                  symbolName = "__48-[HWIFileDownloader connectionDidFinishLoading:]_block_invoke.426"
                   moduleName = "UOneMediaApp"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/chenshilong/Documents/WS/Uone/iOS_UOne/iOS_UOneMedia/trunk/UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-                  timestampString = "487760710.562339"
+                  timestampString = "487845251.113891"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1172"
-                  endingLineNumber = "1172"
-                  offsetFromSymbolStart = "32">
+                  startingLineNumber = "1036"
+                  endingLineNumber = "1036"
+                  offsetFromSymbolStart = "20">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -132,12 +100,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487755755.610296"
+            timestampString = "487842848.048211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "544"
-            endingLineNumber = "544"
-            landmarkName = "-cancelURLConnection:downloadID:"
+            startingLineNumber = "1238"
+            endingLineNumber = "1238"
+            landmarkName = "-connection:didReceiveData:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -148,12 +116,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487758893.134509"
+            timestampString = "487842848.048211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1357"
-            endingLineNumber = "1357"
-            landmarkName = "-handleSuccessfulDownloadToLocalFileURL:downloadItem:downloadID:"
+            startingLineNumber = "1425"
+            endingLineNumber = "1425"
+            landmarkName = "@implementation HWIFileDownloader"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UOneMediaStaticLib/Class/DownloadManager/WspxDownloadManager.m"
+            timestampString = "487830002.223166"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "299"
+            endingLineNumber = "299"
+            landmarkName = "-removeDownloadWithItem:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -163,45 +147,77 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487759600.303597"
+            filePath = "UOneMediaStaticLib/Class/DownloadManager/WspxDownloadManager.m"
+            timestampString = "487830002.223166"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1324"
-            endingLineNumber = "1324"
-            landmarkName = "+localFileURLForRemoteURL:withSuggestFilename:"
+            startingLineNumber = "296"
+            endingLineNumber = "296"
+            landmarkName = "-removeDownloadWithItem:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487759674.730078"
+            filePath = "UOneMediaStaticLib/Class/DownloadManager/UOneDownloadViewController.m"
+            timestampString = "487830239.344286"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "764"
-            endingLineNumber = "764"
-            landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
+            startingLineNumber = "675"
+            endingLineNumber = "675"
+            landmarkName = "-deleteDownloadItemOfDownloadManager"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UOneMediaStaticLib/Class/DownloadManager/WspxDownloadManager.m"
+            timestampString = "487830239.736312"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
+            landmarkName = "-removeDownloadWithItem:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
-            timestampString = "487759706.153225"
+            timestampString = "487842848.048211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "678"
-            endingLineNumber = "678"
-            landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "-initWithDelegate:maxConcurrentDownloads:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
+            timestampString = "487842848.048211"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "685"
+            endingLineNumber = "685"
+            landmarkName = "-URLSession:dataTask:didReceiveResponse:completionHandler:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

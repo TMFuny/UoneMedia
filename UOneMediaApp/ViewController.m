@@ -29,14 +29,14 @@
 - (IBAction) onReset:(UIButton *)button {
     [self.deleteButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     
-//    NSArray* urls = @[@"https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk",
-//                      @"http://sqdd.myapp.com/myapp/qqteam/Androidlite/qqlite_3.4.3.621_android_r108198_GuanWang_537046098_release_10000484.apk",
-//                      @"http://dldir1.qq.com/qqfile/QQforMac/QQ_V4.1.1.dmg",
-//                      @"http://pic.mmfile.net/2014/10/09mt05.jpg",
-//                      @"https://github.com/iosre/iOSAppReverseEngineering/blob/master/iOSAppReverseEngineering.pdf",
-//                      @"http://image58.360doc.com/DownloadImg/2013/01/0800/29455958_1.png"];
-    NSArray* urls = @[@"http://mp4.68mtv.com/mp41/56958-%E4%B8%9C%E4%BA%AC%E5%A5%B3%E5%AD%90%E6%B5%81-Neverever[68mtv.com].mp4",
-                      @"http://ws.cdn.baidupcs.com/file/5a61aa319fb67eaf2f5cef6929571801?bkt=p3-14005a61aa319fb67eaf2f5cef6929571801dc225bd6000000cfd3d8&xcode=3daf96ad9abfece603b2eaceb35e53defd2795b45dc6f023ae97ca166f54709c&fid=436385950-250528-1103431539532031&time=1466064287&sign=FDTAXGERLBH-DCb740ccc5511e5e8fedcff06b081203-NZhNUYCru%2B9Y7R4dZ5aJi5Nq0y4%3D&to=lc&fm=Nan,B,U,nc&sta_dx=13&sta_cs=55&sta_ft=pdf&sta_ct=6&fm2=Nanjing02,B,U,nc&newver=1&newfm=1&secfm=1&flow_ver=3&pkey=14005a61aa319fb67eaf2f5cef6929571801dc225bd6000000cfd3d8&sl=67829838&expires=8h&rt=pr&r=230195769&mlogid=3888740643505992851&vuk=436385950&vbdid=4168186837&fin=OReilly.Programming.iOS.9.2015.11.pdf&slt=pm&uta=0&rtype=1&iv=0&isw=0&dp-logid=3888740643505992851&dp-callid=0.1.1"];
+    NSArray* urls = @[@"https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk",
+                      @"http://sqdd.myapp.com/myapp/qqteam/Androidlite/qqlite_3.4.3.621_android_r108198_GuanWang_537046098_release_10000484.apk",
+                      @"http://dldir1.qq.com/qqfile/QQforMac/QQ_V4.1.1.dmg",
+                      @"http://pic.mmfile.net/2014/10/09mt05.jpg",
+                      @"https://github.com/iosre/iOSAppReverseEngineering/blob/master/iOSAppReverseEngineering.pdf",
+                      @"http://image58.360doc.com/DownloadImg/2013/01/0800/29455958_1.png",
+                      @"http://ws.cdn.baidupcs.com/file/b6d125278e59aedd1977995289049061?bkt=p2-nb-515&xcode=ba73353336162bc5a903dd7fccd1f55a0fad082d53ef39bd7f42c5f191c19e11&fid=436385950-250528-383597722136457&time=1466127279&sign=FDTAXGERLBH-DCb740ccc5511e5e8fedcff06b081203-4qKgO%2B3z%2FOcgLDCFaGy4RJ%2BnGaY%3D&to=lc&fm=Nin,B,U,nc&sta_dx=5&sta_cs=43&sta_ft=epub&sta_ct=6&fm2=Ningbo,B,U,nc&newver=1&newfm=1&secfm=1&flow_ver=3&pkey=1400b6d125278e59aedd1977995289049061a12a3b7b00000053473b&sl=82968655&expires=8h&rt=pr&r=648155670&mlogid=3905649790134642953&vuk=436385950&vbdid=700017651&fin=OReilly.Programming.iOS.9.2015.11.epub&slt=pm&uta=0&rtype=1&iv=0&isw=0&dp-logid=3905649790134642953&dp-callid=0.1.1"];
+
     
     [urls enumerateObjectsUsingBlock: ^(NSString* obj, NSUInteger idx, BOOL *stop) {
         NSURL* url = [NSURL URLWithString:obj];
