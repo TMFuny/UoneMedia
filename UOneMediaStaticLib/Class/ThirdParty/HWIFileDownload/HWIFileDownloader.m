@@ -97,6 +97,8 @@
                 aBackgroundSessionConfiguration = [NSURLSessionConfiguration backgroundSessionConfiguration:aBackgroundDownloadSessionIdentifier];
 #pragma GCC diagnostic pop
             }
+            NSString *maxFloatString = [NSString stringWithFormat:@"bytes=0-%llu",MAXFLOAT];
+            [aBackgroundSessionConfiguration setHTTPAdditionalHeaders:@{ @"Range" : maxFloatString}];
             if ([self.fileDownloadDelegate respondsToSelector:@selector(customizeBackgroundSessionConfiguration:)])
             {
                 [self.fileDownloadDelegate customizeBackgroundSessionConfiguration:aBackgroundSessionConfiguration];
@@ -222,6 +224,7 @@
             aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
         } else {
             aDataTask = [[NSURLSession sharedSession] dataTaskWithURL:aRemoteURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                NSLog(@"responseHeaderFields:%@",response);
                 if ([response expectedContentLength] != -1) {
                     if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
                         
@@ -245,7 +248,7 @@
     }
     aDownloadID = aDataTask.taskIdentifier;
     aDataTask.taskDescription = aDownloadToken;
-    
+    NSLog(@"backgroundSession:%@",self.backgroundSession.configuration.HTTPAdditionalHeaders);
     [self.deActiveDownloadsArray addObject:aDownloadToken];
     [aDataTask resume];
 }
@@ -834,11 +837,9 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
             NSDictionary * headlerFields = [httpResponse allHeaderFields];
             NSString *cacheControl = nil;
             NSLog(@"headerFields:%@", headlerFields);
-            cacheControl = [headlerFields objectForKey:@"Cache-Control"];
-            if (!cacheControl) {
-                cacheControl = [headlerFields objectForKey:@"Cache-Controli"];
-            }
-            if ([cacheControl isEqualToString:@"public"]) {
+            cacheControl = [headlerFields objectForKey:@"Accept-Ranges"];
+            
+            if (cacheControl && cacheControl.length != 0) {
                 aDownloadItem.isSupportResumeWithoutRestart = YES;
             }
         } else {
