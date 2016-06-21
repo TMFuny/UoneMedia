@@ -15,8 +15,9 @@
 @protocol UoneDownloadViewControllerDelegate <NSObject>
 
 @required
--(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController canPreviewItem:(BOOL)canPreviewItem;
--(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController canPresentOptionsMenu:(BOOL)canPresentOptionsMenu;
+
+-(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController failedToPreviewItem:(nonnull WspxDownloadItem *)aDownloadItem;
+-(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController failedToPresentOptionsMenu:(nonnull WspxDownloadItem *)aDownloadItem;
 
 @optional
 -(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController isComfirmToDeleteDownloads:(BOOL)isConfirmToDelete;
@@ -38,12 +39,14 @@
 
 @protocol UoneDownloadViewControllerDataSource <NSObject>
 
+@required
+- (BOOL)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController shouldPreviewForDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem; //是否需要支持app内预览
+- (BOOL)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController shouldOpenOptionsMenuForDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem;//是否显示使用其他应用的
 @optional
 // -downloadViewController:shouldPauseForDownloadItem: is called when a pause touch comes down on a downloadItem.
 // Returning NO to do nothing
 //          YES to pause current downloadItem.
 - (BOOL)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController shouldPauseForDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem; //是否需要暂停
-
 @end
 
 @interface UOneDownloadViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UOneDownloadTableViewCellDelegate>

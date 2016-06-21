@@ -76,27 +76,27 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
         case kPKDownloadButtonState_StartDownload:
             self.startDownloadButton.hidden = NO;
             self.downloadingButton.pkProgress = 0.f;
-            NSLog(@"download state: StartDownLaod");
+            NSLog(@"downloadButton state: StartDownLaod");
             break;
         case kPKDownloadButtonState_Pending:
             self.pendingView.hidden = NO;
 //            [self.pendingView startSpin];
-            NSLog(@"download state: Pending");
+            NSLog(@"downloadButton state: Pending");
             break;
         case kPKDownloadButtonState_Downloading:
             self.downloadingButton.hidden = NO;
-            NSLog(@"download state: downloading");
+            NSLog(@"downloadButton state: downloading");
             break;
         case kPKDownloadButtonState_Pausing:
             self.pauseDownloadButton.hidden = NO;
-            NSLog(@"download state: Pausing");
+            NSLog(@"downloadButton state: Pausing");
         break;
         case kPKDownloadButtonState_Downloaded:
         {
             self.downloadedButton.hidden = NO;
             self.hidden = YES;
             self.userInteractionEnabled = NO;
-            NSLog(@"download state: Downloaded");
+            NSLog(@"downloadButton state: Downloaded");
         }
             break;
         case kPKDownloadButtonState_Error:
@@ -106,7 +106,7 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
         }
             break;
         default:
-            NSAssert(NO, @"unsupported state");
+            NSAssert(NO, @"downloadButton unsupported state");
             break;
     }
 }

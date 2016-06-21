@@ -134,6 +134,8 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         {
             [_progress removeObserver:self forKeyPath:NSStringFromSelector(@selector(fractionCompleted))];
         }
+        NSLog(@"manager progress: %@\n", _progress);
+        
         _progress = [NSProgress progressWithTotalUnitCount:0];
         if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
         {
@@ -149,7 +151,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 
 - (void)startDownloadWithItem:(nonnull WspxDownloadItem *)aDownloadItem {
     
-    [self resetProgressIfNoActiveDownloadsRunning];
+//    [self resetProgressIfNoActiveDownloadsRunning];
     
     if ((aDownloadItem.status != WspxDownloadItemStatusCancelled) && (aDownloadItem.status != WspxDownloadItemStatusCompleted))
     {
@@ -181,7 +183,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 
 - (void)resumeDownloadWithItem:(nonnull WspxDownloadItem *)aDownloadItem {
     
-    [self resetProgressIfNoActiveDownloadsRunning];
+//    [self resetProgressIfNoActiveDownloadsRunning];
     
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_8_4)
     {

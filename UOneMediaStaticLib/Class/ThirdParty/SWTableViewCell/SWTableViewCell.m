@@ -193,7 +193,6 @@ static NSString * const kTableViewPanState = @"state";
 
 - (void)setContainingTableView:(UITableView *)containingTableView
 {
-  NSLog(@"setContainingTableView");
     [self removeOldTableViewPanObserver];
     
     _tableViewPanGestureRecognizer = containingTableView.panGestureRecognizer;

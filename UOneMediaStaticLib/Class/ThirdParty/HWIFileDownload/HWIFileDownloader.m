@@ -97,8 +97,6 @@
                 aBackgroundSessionConfiguration = [NSURLSessionConfiguration backgroundSessionConfiguration:aBackgroundDownloadSessionIdentifier];
 #pragma GCC diagnostic pop
             }
-            NSString *maxFloatString = [NSString stringWithFormat:@"bytes=0-%llu",MAXFLOAT];
-            [aBackgroundSessionConfiguration setHTTPAdditionalHeaders:@{ @"Range" : maxFloatString}];
             if ([self.fileDownloadDelegate respondsToSelector:@selector(customizeBackgroundSessionConfiguration:)])
             {
                 [self.fileDownloadDelegate customizeBackgroundSessionConfiguration:aBackgroundSessionConfiguration];
@@ -190,8 +188,8 @@
 - (void)startDownloadWithIdentifier:(nonnull NSString *)aDownloadIdentifier
                       fromRemoteURL:(nonnull NSURL *)aRemoteURL
 {
-//    [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
-    [self startDataTaskWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
+    [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
+//    [self startDataTaskWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
 }
 
 
@@ -220,11 +218,19 @@
 - (void)resumDataTaskWithRemoteURL:(NSURL*)aRemoteURL downloadID:(NSUInteger)aDownloadID DownloadToken:(nonnull NSString *)aDownloadToken {
     NSURLSessionDataTask *aDataTask = nil;
     if (aRemoteURL) {
+        NSTimeInterval aRequestTimeoutInterval = 60.0; // iOS default value
+        NSMutableURLRequest *dataRequest = [[NSMutableURLRequest alloc] initWithURL:aRemoteURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:aRequestTimeoutInterval];
+        dataRequest.HTTPMethod = @"HEAD";
+        NSString *maxFloatString = [NSString stringWithFormat:@"bytes=0-%llu",MAXFLOAT];
+        [dataRequest setAllHTTPHeaderFields:@{ @"Range" : maxFloatString}];
+        NSLog(@"time out dataTask :%f", dataRequest.timeoutInterval);
         if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_8_0) {
-            aDataTask = [self.backgroundSession dataTaskWithURL:aRemoteURL];
+            
+            aDataTask = [self.backgroundSession dataTaskWithRequest:dataRequest];
         } else {
-            aDataTask = [[NSURLSession sharedSession] dataTaskWithURL:aRemoteURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                NSLog(@"responseHeaderFields:%@",response);
+
+            aDataTask = [[NSURLSession sharedSession] dataTaskWithRequest:dataRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                NSLog(@"responseHeaderFields:%@ data:%@",response, data);
                 if ([response expectedContentLength] != -1) {
                     if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
                         
@@ -242,13 +248,13 @@
                         [self startDownloadWithIdentifier:aDownloadToken fromRemoteURL:aRemoteURL];
                     }
                 }
-                
+                [aDataTask cancel];
             }];
         }
     }
     aDownloadID = aDataTask.taskIdentifier;
     aDataTask.taskDescription = aDownloadToken;
-    NSLog(@"backgroundSession:%@",self.backgroundSession.configuration.HTTPAdditionalHeaders);
+    
     [self.deActiveDownloadsArray addObject:aDownloadToken];
     [aDataTask resume];
 }
@@ -685,6 +691,7 @@
 #pragma mark - NSURLSessionDataDelegate
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+     NSLog(@"responseHeaderFields:%@",response);
     if ([response expectedContentLength] != -1) {
         if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
             
@@ -697,12 +704,13 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
                 [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
             }
         }
+        completionHandler(NSURLSessionResponseCancel);
     } else {//不知道文件长度的也继续下载
         if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
             [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
         }
+        completionHandler(NSURLSessionResponseCancel);
     }
-    
     
     HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(dataTask.taskIdentifier)];
     if (aDownloadItem)
@@ -832,19 +840,14 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
             aDownloadItem.downloadStartDate = [NSDate date];
         }
        
-        if ([aDownloadTask.response isKindOfClass:[NSHTTPURLResponse class]]) {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
-            NSDictionary * headlerFields = [httpResponse allHeaderFields];
-            NSString *cacheControl = nil;
-            NSLog(@"headerFields:%@", headlerFields);
-            cacheControl = [headlerFields objectForKey:@"Accept-Ranges"];
-            
-            if (cacheControl && cacheControl.length != 0) {
-                aDownloadItem.isSupportResumeWithoutRestart = YES;
-            }
+        NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
+        NSInteger aHttpStatusCode = aHttpResponse.statusCode;
+        if (aHttpStatusCode == 206) {
+            aDownloadItem.isSupportResumeWithoutRestart = YES;
         } else {
             aDownloadItem.isSupportResumeWithoutRestart = NO;
         }
+        
         aDownloadItem.receivedFileSizeInBytes = aTotalBytesWrittenCount;
         aDownloadItem.expectedFileSizeInBytes = aTotalBytesExpectedToWriteCount;
         NSString *suggesFileName = aDownloadTask.response.suggestedFilename;

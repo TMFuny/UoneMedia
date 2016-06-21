@@ -10,14 +10,14 @@
 
 typedef NS_ENUM(NSUInteger, WspxDownloadItemStatus) {
     WspxDownloadItemStatusNotStarted = 0,
-    WspxDownloadItemStatusPending,
-    WspxDownloadItemStatusStarted,
-    WspxDownloadItemStatusCompleted,
-    WspxDownloadItemStatusPaused,
-    WspxDownloadItemStatusCancelled,
-    WspxDownloadItemStatusDeleted,
-    WspxDownloadItemStatusInterrupted,
-    WspxDownloadItemStatusError
+    WspxDownloadItemStatusPending = 1,
+    WspxDownloadItemStatusStarted = 2,
+    WspxDownloadItemStatusCompleted = 3,
+    WspxDownloadItemStatusPaused = 4,
+    WspxDownloadItemStatusCancelled = 5,
+    WspxDownloadItemStatusDeleted = 6,
+    WspxDownloadItemStatusInterrupted = 7,
+    WspxDownloadItemStatusError = 8
 };
 
 

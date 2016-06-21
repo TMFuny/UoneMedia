@@ -260,7 +260,12 @@
         }
     }];
     
-    UIImage * iconImage = [UIImage imageNamed:[staticExtImageMap objectForKey:imageKey]];
+    NSString *imageName = [staticExtImageMap objectForKey:imageKey];
+    
+    if (!imageName) {
+        imageName = @"UOneMedia.bundle/未知文件";
+    }
+    UIImage * iconImage = [UIImage imageNamed:imageName];
     
     return iconImage != nil ? iconImage : [UIImage imageNamed:@"UOneMedia.bundle/未知文件"];
 }

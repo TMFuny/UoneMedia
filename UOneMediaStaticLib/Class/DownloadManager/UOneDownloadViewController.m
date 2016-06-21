@@ -219,26 +219,8 @@ UOneDownloadTableViewCellDelegate>
             if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickCellForPreview:)]) {
                 [_delegate downloadViewController:self didClickCellForPreview:indexPath];
             }
-            NSURL *fileUrl = [NSURL fileURLWithPath:item.localFileURL.absoluteString isDirectory:YES];
-            BOOL isCanPreview = [QLPreviewController canPreviewItem:fileUrl];
-            if (isCanPreview) {
-                QLPreviewController *previewController = [[QLPreviewController alloc] init];
-                previewController.dataSource = self;
-                previewController.delegate = self;
-
-                previewController.currentPreviewItemIndex = indexPath.row;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    
-                    [self presentViewController:previewController animated:YES completion:nil];
-                });
-            } else {
-                
-                if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:canPreviewItem:)]) {
-                    [_delegate downloadViewController:self canPreviewItem:NO];
-                } else {
-                    [self presentOptionsMenu];
-                }
-            }
+            [self handlePreviewDownload:item withIndexPath:indexPath];
+            
         }
             break;
     }
@@ -258,8 +240,8 @@ UOneDownloadTableViewCellDelegate>
                                                                                    animated:YES];
 
     if (!isCanPresentOtionsMenu) {
-        if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:canPresentOptionsMenu:)]) {
-            [_delegate downloadViewController:self canPresentOptionsMenu:NO];
+        if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:failedToPresentOptionsMenu:)]) {
+            [_delegate downloadViewController:self failedToPresentOptionsMenu:item];
         } else {
             [self showAlertViewWithTitle:nil
                                  message:@"找不到打开该文件的app"
@@ -464,7 +446,7 @@ UOneDownloadTableViewCellDelegate>
 }
 - (void)onDownloadDidPending:(NSNotification *)aNotification {
     WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
-    NSLog(@"onProgressDidChange --> %@", aDownloadedItem);
+    NSLog(@"onDownloadDidPending --> %@", aDownloadedItem);
     
     NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
         if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
@@ -550,6 +532,50 @@ UOneDownloadTableViewCellDelegate>
         [_delegate downloadViewController:self didClickDownloadItemForResume:aDownloadItem];
     }
     [_downloadManager resumeDownloadWithItem:aDownloadItem];
+}
+
+- (void)handlePreviewDownload:(WspxDownloadItem *)aDownloadItem withIndexPath:(NSIndexPath *)indexPath {
+    
+    if (_dataSource && [_dataSource respondsToSelector:@selector(downloadViewController:shouldPreviewForDownloadItem:)]) {
+        if ([_dataSource downloadViewController:self shouldPreviewForDownloadItem:aDownloadItem]) {
+            [self setupPreviewWithDownloadItem:aDownloadItem indexPath:indexPath];
+            return;
+        }
+    }
+    
+    if (_dataSource && [_dataSource respondsToSelector:@selector(downloadViewController:shouldOpenOptionsMenuForDownloadItem:)]) {
+        if ([_dataSource downloadViewController:self shouldOpenOptionsMenuForDownloadItem:aDownloadItem]) {
+            [self presentOptionsMenu];
+            return;
+        }
+    }
+}
+
+- (void)setupPreviewWithDownloadItem:(WspxDownloadItem *)aDownloadItem indexPath:(NSIndexPath *)indexPath {
+    NSURL *fileUrl = [NSURL fileURLWithPath:aDownloadItem.localFileURL.absoluteString isDirectory:YES];
+    BOOL isCanPreview = [QLPreviewController canPreviewItem:fileUrl];
+    if (isCanPreview) {
+        QLPreviewController *previewController = [[QLPreviewController alloc] init];
+        previewController.dataSource = self;
+        previewController.delegate = self;
+        
+        previewController.currentPreviewItemIndex = indexPath.row;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [self presentViewController:previewController animated:YES completion:nil];
+        });
+    } else {
+        
+        if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:failedToPreviewItem:)]) {
+            [_delegate downloadViewController:self failedToPreviewItem:aDownloadItem];
+        } else {
+            if (_dataSource && [_dataSource respondsToSelector:@selector(downloadViewController:shouldOpenOptionsMenuForDownloadItem:)]) {
+                if ([_dataSource downloadViewController:self shouldOpenOptionsMenuForDownloadItem:aDownloadItem]) {
+                    [self presentOptionsMenu];
+                }
+            }
+        }
+    }
 }
 
 - (void)onSelected:(BOOL)selected tableViewCell:(UOneDownloadTableViewCell*)cell {
