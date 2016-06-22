@@ -625,6 +625,8 @@
 }
 
 
+
+
 - (BOOL)isWaitingForDownloadOfIdentifier:(nonnull NSString *)aDownloadIdentifier
 {
     BOOL isWaitingForDownload = NO;
@@ -832,6 +834,16 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 
 - (void)URLSession:(nonnull NSURLSession *)aSession downloadTask:(nonnull NSURLSessionDownloadTask *)aDownloadTask didWriteData:(int64_t)aBytesWrittenCount totalBytesWritten:(int64_t)aTotalBytesWrittenCount totalBytesExpectedToWrite:(int64_t)aTotalBytesExpectedToWriteCount
 {
+    if ([aDownloadTask.response expectedContentLength] != -1) {
+        if ([aDownloadTask.response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
+            
+            if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
+                [self.fileDownloadDelegate downloadStorageAlmostFull];
+                NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [aDownloadTask.response expectedContentLength], [self getFreeDiskspaceInBytes], aDownloadTask.originalRequest.URL, aDownloadTask.taskDescription, aDownloadTask.response);
+            }
+        }
+    }
+    
     HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadTask.taskIdentifier)];
     if (aDownloadItem)
     {
@@ -839,15 +851,24 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
         {
             aDownloadItem.downloadStartDate = [NSDate date];
         }
-       
-        NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
-        NSInteger aHttpStatusCode = aHttpResponse.statusCode;
-        if (aHttpStatusCode == 206) {
-            aDownloadItem.isSupportResumeWithoutRestart = YES;
-        } else {
-            aDownloadItem.isSupportResumeWithoutRestart = NO;
+        if ([aDownloadTask.response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
+            NSInteger aHttpStatusCode = aHttpResponse.statusCode;
+            if (aHttpStatusCode == 206) {
+                aDownloadItem.isSupportResumeWithoutRestart = YES;
+                
+            } else {
+                NSDictionary * headlerFields = [aHttpResponse allHeaderFields];
+                NSString *AcceptRanges = nil;
+                
+                AcceptRanges = [headlerFields objectForKey:@"Accept-Ranges"];
+                
+                if ([AcceptRanges isEqualToString:@"bytes"]) {
+                    aDownloadItem.isSupportResumeWithoutRestart = YES;
+                }
+            }
         }
-        
+
         aDownloadItem.receivedFileSizeInBytes = aTotalBytesWrittenCount;
         aDownloadItem.expectedFileSizeInBytes = aTotalBytesExpectedToWriteCount;
         NSString *suggesFileName = aDownloadTask.response.suggestedFilename;

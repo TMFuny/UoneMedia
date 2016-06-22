@@ -20,12 +20,12 @@
 @interface UoneDownloadToolbar : UIToolbar
 @property (assign, nonatomic) BOOL isEditing;
 @property (assign, nonatomic) BOOL isLabelMode;
-@property (strong, nonatomic) UIButton *selectAllButton;
-@property (strong, nonatomic) UIButton *deleteButton;
-@property (strong, nonatomic) UIButton *doneButton;
-@property (strong, nonatomic) UIButton *editButton;
-@property (strong, nonatomic) UILabel *diskUsageAndStorageLabel;
-@property (weak, nonatomic) id<UoneDownloadToolbarDelegate> customedDelegate;
+@property (strong, nonatomic, nonnull) UIButton *selectAllButton;
+@property (strong, nonatomic, nonnull) UIButton *deleteButton;
+@property (strong, nonatomic, nonnull) UIButton *doneButton;
+@property (strong, nonatomic, nonnull) UIButton *editButton;
+@property (strong, nonatomic, nullable) UILabel *diskUsageAndStorageLabel;
+@property (weak, nonatomic, nullable) id<UoneDownloadToolbarDelegate> customedDelegate;
 
 -(void)layout;
 -(void)setDeleteTitle:(nullable NSString*)deleteTitle;

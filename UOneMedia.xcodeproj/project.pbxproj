@@ -91,6 +91,8 @@
 		B63475031D059B9B001B3B20 /* SWUtilityButtonView.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474F21D059B9B001B3B20 /* SWUtilityButtonView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B63475041D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */; };
 		B63475051D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */; };
+		B65127811D1A41BE002DA5AA /* UOMReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B651277F1D1A41BE002DA5AA /* UOMReachability.h */; };
+		B65127821D1A41BE002DA5AA /* UOMReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B65127801D1A41BE002DA5AA /* UOMReachability.m */; };
 		B6F42C101D00155C0018D694 /* PKDownloadButton.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA651CFC527000DEE8CE /* PKDownloadButton.m */; };
 		B6F9CA711CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h in Headers */ = {isa = PBXBuildFile; fileRef = B6F9CA5A1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6F9CA721CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */; };
@@ -221,6 +223,8 @@
 		B63474F11D059B9B001B3B20 /* SWUtilityButtonTapGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonTapGestureRecognizer.m; sourceTree = "<group>"; };
 		B63474F21D059B9B001B3B20 /* SWUtilityButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonView.h; sourceTree = "<group>"; };
 		B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonView.m; sourceTree = "<group>"; };
+		B651277F1D1A41BE002DA5AA /* UOMReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UOMReachability.h; sourceTree = "<group>"; };
+		B65127801D1A41BE002DA5AA /* UOMReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UOMReachability.m; sourceTree = "<group>"; };
 		B6F9CA5A1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+PKDownloadButtonAnimations.h"; sourceTree = "<group>"; };
 		B6F9CA5B1CFC527000DEE8CE /* CALayer+PKDownloadButtonAnimations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+PKDownloadButtonAnimations.m"; sourceTree = "<group>"; };
 		B6F9CA5C1CFC527000DEE8CE /* NSLayoutConstraint+PKDownloadButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSLayoutConstraint+PKDownloadButton.h"; sourceTree = "<group>"; };
@@ -349,6 +353,7 @@
 		1C5B34421CF6A1A700271B7C /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				B65127721D1A36BC002DA5AA /* Reachability */,
 				B60CDDF31D066A7E00323C01 /* AlertView */,
 				B63474E71D059B9B001B3B20 /* SWTableViewCell */,
 				B6F9CA591CFC527000DEE8CE /* PKDownloadButton */,
@@ -458,6 +463,15 @@
 			path = SWTableViewCell;
 			sourceTree = "<group>";
 		};
+		B65127721D1A36BC002DA5AA /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				B651277F1D1A41BE002DA5AA /* UOMReachability.h */,
+				B65127801D1A41BE002DA5AA /* UOMReachability.m */,
+			);
+			path = Reachability;
+			sourceTree = "<group>";
+		};
 		B6F9CA591CFC527000DEE8CE /* PKDownloadButton */ = {
 			isa = PBXGroup;
 			children = (
@@ -518,6 +532,7 @@
 				B63474FD1D059B9B001B3B20 /* SWTableViewCell.h in Headers */,
 				B63474FA1D059B9B001B3B20 /* SWLongPressGestureRecognizer.h in Headers */,
 				B60CDDFB1D066A7E00323C01 /* WSPXAlertManager.h in Headers */,
+				B65127811D1A41BE002DA5AA /* UOMReachability.h in Headers */,
 				B60CDDF81D066A7E00323C01 /* UIAlertView+WSPXUtility.h in Headers */,
 				B63474AB1D057A73001B3B20 /* UoneDownloadToolbar.h in Headers */,
 				1C5B34AF1CF6D8D400271B7C /* UOneMediaStaticLib_Prefix.pch in Headers */,
@@ -726,6 +741,7 @@
 				1C5B34521CF6A1A700271B7C /* HWIFileDownloadItem.m in Sources */,
 				B6F9CA971CFC527000DEE8CE /* PKStopDownloadButton.m in Sources */,
 				1C5B34AD1CF6D6DE00271B7C /* NSBundle+WspxUtility.m in Sources */,
+				B65127821D1A41BE002DA5AA /* UOMReachability.m in Sources */,
 				B63474F81D059B9B001B3B20 /* SWCellScrollView.m in Sources */,
 				1C5B34511CF6A1A700271B7C /* HWIFileDownloader.m in Sources */,
 				B63474F51D059B9B001B3B20 /* NSMutableArray+SWUtilityButtons.m in Sources */,

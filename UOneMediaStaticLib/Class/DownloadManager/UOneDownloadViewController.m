@@ -15,6 +15,8 @@
 #import "NSBundle+WspxUtility.h"
 #import "UoneDownloadToolbar.h"
 #import "WSPXAlertManager.h"
+#import "UOMReachability.h"
+
 
 @interface UOneDownloadViewController ()<QLPreviewControllerDataSource,
 QLPreviewControllerDelegate,
@@ -23,6 +25,8 @@ UoneDownloadToolbarDelegate,
 SWTableViewCellDelegate,
 UOneDownloadTableViewCellDelegate>
 @property (nonatomic, strong) UIDocumentInteractionController *docInteractionController;
+@property (nonatomic, assign, readwrite) BOOL isUserInterfaceEnable;
+@property (nonatomic) UOMReachability *internetReachability;
 @end
 
 @implementation UOneDownloadViewController
@@ -48,8 +52,6 @@ UOneDownloadTableViewCellDelegate>
     [super viewDidLoad];
   
     // Do any additional setup after loading the view from its nib.
-
-    
     self.downloadManager = [WspxDownloadManager shareInstance];
     _selectedIndexSet = [NSMutableIndexSet indexSet];
     _downloadList = [[NSMutableArray alloc] init];
@@ -121,6 +123,15 @@ UOneDownloadTableViewCellDelegate>
     [self.tableView reloadData];
     
     [self registerNotification];
+
+    self.internetReachability = [UOMReachability reachabilityForInternetConnection];
+    [self.internetReachability startNotifier];
+    NetworkStatus status = self.internetReachability.currentReachabilityStatus;
+    if (status == NotReachable) {
+        _isUserInterfaceEnable = NO;
+    } else {
+        _isUserInterfaceEnable = YES;
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -128,6 +139,9 @@ UOneDownloadTableViewCellDelegate>
     // Dispose of any resources that can be recreated.
 }
 
+- (void)dealloc {
+    [self unregisterNotification];
+}
 #pragma mark - UIInit
 #pragma mark - UIConfig
 #pragma mark - UIUpdate
@@ -191,7 +205,7 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.tableView.isEditing) {
+    if (self.tableView.isEditing) {//编辑状态
         return;
     }
     WspxDownloadItem* item = _downloadList[indexPath.row];
@@ -203,7 +217,7 @@ UOneDownloadTableViewCellDelegate>
         case WspxDownloadItemStatusInterrupted:
         case WspxDownloadItemStatusError:
         {
-            [_downloadManager startDownloadWithItem:item];
+            [self handleStartDownload:item];
         }
             break;
         case WspxDownloadItemStatusPending:
@@ -211,7 +225,7 @@ UOneDownloadTableViewCellDelegate>
             break;
         case WspxDownloadItemStatusPaused:
         {
-            [_downloadManager resumeDownloadWithItem:item];
+            [self handleResumeDownload:item];
         }
             break;
         case WspxDownloadItemStatusCompleted:
@@ -227,31 +241,6 @@ UOneDownloadTableViewCellDelegate>
     
 }
 
-- (void)presentOptionsMenu {
-    NSIndexPath *path = [self.tableView indexPathForSelectedRow];
-    WspxDownloadItem *item = _downloadList[path.row];
-    NSURL *fileURL = item.localFileURL;
-    [self setupDocumentControllerWithURL:fileURL];
-    self.docInteractionController.URL = fileURL;
-    
-    
-    BOOL isCanPresentOtionsMenu = [self.docInteractionController presentOptionsMenuFromRect:self.tableView.frame
-                                                                                     inView:self.tableView
-                                                                                   animated:YES];
-
-    if (!isCanPresentOtionsMenu) {
-        if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:failedToPresentOptionsMenu:)]) {
-            [_delegate downloadViewController:self failedToPresentOptionsMenu:item];
-        } else {
-            [self showAlertViewWithTitle:nil
-                                 message:@"找不到打开该文件的app"
-                             cancelTitle:@"知道了"
-                            cancelAction:nil
-                            confirmTitle:nil
-                           confirmAction:nil];
-        }
-    }
-}
 #pragma mark UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -369,6 +358,7 @@ UOneDownloadTableViewCellDelegate>
 #pragma mark WspxDownloadManager Notification
 
 - (void)registerNotification {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kUoneReachabilityChangedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidComplete:) name:wspxDownloadDidCompleteNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onProgressDidChange:) name:wspxDownloadProgressChangedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidPending:) name:wspxDownloadDidPendingNotification object:nil];
@@ -380,6 +370,7 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)unregisterNotification {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kUoneReachabilityChangedNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidCompleteNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadProgressChangedNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidPendingNotification object:nil];
@@ -511,7 +502,36 @@ UOneDownloadTableViewCellDelegate>
     if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForStart:)]) {
         [_delegate downloadViewController:self didClickDownloadItemForStart:aDownloadItem];
     }
+    
+    if (!_isUserInterfaceEnable) {
+        return;
+    }
+    
+    if (_dataSource && [_dataSource respondsToSelector:@selector(downloadViewControllerShouldDownloadingWithReachabilityReachable:)]) {
+        if ([_dataSource downloadViewControllerShouldDownloadingWithReachabilityReachable:self]) {
+            [_downloadManager startDownloadWithItem:aDownloadItem];
+        }
+        return;
+    }
     [_downloadManager startDownloadWithItem:aDownloadItem];
+}
+
+- (void)handleResumeDownload:(WspxDownloadItem *)aDownloadItem {
+    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForResume:)]) {
+        [_delegate downloadViewController:self didClickDownloadItemForResume:aDownloadItem];
+    }
+    
+    if (!_isUserInterfaceEnable) {
+        return;
+    }
+    
+    if (_dataSource && [_dataSource respondsToSelector:@selector(downloadViewControllerShouldDownloadingWithReachabilityReachable:)]) {
+        if ([_dataSource downloadViewControllerShouldDownloadingWithReachabilityReachable:self]) {
+            [_downloadManager resumeDownloadWithItem:aDownloadItem];
+        }
+        return;
+    }
+    [_downloadManager resumeDownloadWithItem:aDownloadItem];
 }
 
 - (void)handlePauseDownload:(WspxDownloadItem *)aDownloadItem {
@@ -525,13 +545,6 @@ UOneDownloadTableViewCellDelegate>
     } else {
         [_downloadManager pauseDownloadWithItem:aDownloadItem];
     }
-}
-
-- (void)handleResumeDownload:(WspxDownloadItem *)aDownloadItem {
-    if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForResume:)]) {
-        [_delegate downloadViewController:self didClickDownloadItemForResume:aDownloadItem];
-    }
-    [_downloadManager resumeDownloadWithItem:aDownloadItem];
 }
 
 - (void)handlePreviewDownload:(WspxDownloadItem *)aDownloadItem withIndexPath:(NSIndexPath *)indexPath {
@@ -595,7 +608,7 @@ UOneDownloadTableViewCellDelegate>
 
 #pragma mark - UoneDownloadToolbarDelegate
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedEditButton:(UIButton *)button {
-    
+    [self disableUserInterfaceWithNetworkNotReachable];
     if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickToolBarForEdit:)]) {
         [_delegate downloadViewController:self didClickToolBarForEdit:toolbar];
     }
@@ -687,7 +700,57 @@ UOneDownloadTableViewCellDelegate>
 }
 #pragma mark - Target-Action Event
 #pragma mark - PublicMethod
+- (void)presentOptionsMenu {
+    dispatch_async(dispatch_get_main_queue(), ^{//http://stackoverflow.com/questions/20320591/uitableview-and-presentviewcontroller-takes-2-clicks-to-display
+        
+        NSIndexPath *path = [self.tableView indexPathForSelectedRow];
+        WspxDownloadItem *item = _downloadList[path.row];
+        NSURL *fileURL = item.localFileURL;
+        [self setupDocumentControllerWithURL:fileURL];
+        self.docInteractionController.URL = fileURL;
+        
+        
+        BOOL isCanPresentOtionsMenu = [self.docInteractionController presentOptionsMenuFromRect:self.tableView.frame
+                                                                                         inView:self.tableView
+                                                                                       animated:YES];
+        
+        if (!isCanPresentOtionsMenu) {
+            if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:failedToPresentOptionsMenu:)]) {
+                [_delegate downloadViewController:self failedToPresentOptionsMenu:item];
+            } else {
+                [self showAlertViewWithTitle:nil
+                                     message:@"找不到打开该文件的app"
+                                 cancelTitle:@"知道了"
+                                cancelAction:nil
+                                confirmTitle:nil
+                               confirmAction:nil];
+            }
+        }
+    });
+}
+
+- (void)disableUserInterfaceWithNetworkNotReachable {
+    _isUserInterfaceEnable = NO;
+}
+
+- (void)enableUserInterfaceWithNetworkReachable {
+    _isUserInterfaceEnable = YES;
+}
 #pragma mark - PrivateMethod
+
+- (void)reachabilityChanged:(NSNotification *)note {
+    if ([_dataSource respondsToSelector:@selector(downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:)]) {
+        if ([_dataSource downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:self]) {
+            UOMReachability* curReach = [note object];
+            NetworkStatus status = curReach.currentReachabilityStatus;
+            if (status == NotReachable) {
+                 [self disableUserInterfaceWithNetworkNotReachable];
+            } else {
+                [self enableUserInterfaceWithNetworkReachable];
+            }
+        }
+    }
+}
 
 -(void) refreshDownloadList {
     [_downloadList removeAllObjects];
@@ -729,52 +792,54 @@ UOneDownloadTableViewCellDelegate>
                   cancelAction:(void(^ __nullable)())cancelBlock
                   confirmTitle:(nullable NSString*)confirmTitle
                  confirmAction:(void(^ __nullable)()) confirmBlock {
-    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                                 message:message
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:confirmTitle
-                                                                style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * _Nonnull action) {
-                                                                  if (confirmBlock) {
-                                                                      confirmBlock();
-                                                                  }
-                                                              }];
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
-                                                               style:UIAlertActionStyleCancel
-                                                             handler:^(UIAlertAction * _Nonnull action) {
-                                                                 if (cancelBlock) {
-                                                                     cancelBlock();
-                                                                 }
-                                                             }];
-        [alertController addAction:confirmAction];
-        [alertController addAction:cancelAction];
-        [self presentViewController:alertController animated:YES completion:nil];
-    } else {
-        _alertManager = [[WSPXAlertManager alloc] init];
-        
-        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:title
-                                                            message:message
-                                                           delegate:nil
-                                                  cancelButtonTitle:cancelTitle
-                                                  otherButtonTitles: confirmTitle, nil];
-        alertView.didClickedButtonHandler = ^BOOL(UIAlertView* alertView, NSInteger buttonIndex) {
-            if (buttonIndex == 1) {
-                if (confirmBlock) {
-                    confirmBlock();
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+            
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                     message:message
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:confirmTitle
+                                                                    style:UIAlertActionStyleDefault
+                                                                  handler:^(UIAlertAction * _Nonnull action) {
+                                                                      if (confirmBlock) {
+                                                                          confirmBlock();
+                                                                      }
+                                                                  }];
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
+                                                                   style:UIAlertActionStyleCancel
+                                                                 handler:^(UIAlertAction * _Nonnull action) {
+                                                                     if (cancelBlock) {
+                                                                         cancelBlock();
+                                                                     }
+                                                                 }];
+            [alertController addAction:confirmAction];
+            [alertController addAction:cancelAction];
+            [self presentViewController:alertController animated:YES completion:nil];
+        } else {
+            _alertManager = [[WSPXAlertManager alloc] init];
+            
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:title
+                                                                message:message
+                                                               delegate:nil
+                                                      cancelButtonTitle:cancelTitle
+                                                      otherButtonTitles: confirmTitle, nil];
+            alertView.didClickedButtonHandler = ^BOOL(UIAlertView* alertView, NSInteger buttonIndex) {
+                if (buttonIndex == 1) {
+                    if (confirmBlock) {
+                        confirmBlock();
+                    }
+                } else {
+                    if (cancelBlock) {
+                        cancelBlock();
+                    }
                 }
-            } else {
-                if (cancelBlock) {
-                    cancelBlock();
-                }
-            }
-            return YES;
-        };
-        
-        [_alertManager push:alertView];
-    }
+                return YES;
+            };
+            
+            [_alertManager push:alertView];
+        }
+    });
 }
 
 - (NSString*)getDeleteString {
@@ -795,10 +860,6 @@ UOneDownloadTableViewCellDelegate>
     {
         self.docInteractionController.URL = url;
     }
-}
-
-- (void)setQLPreviewControllerWithURL:(NSURL *)url {
-    
 }
 
 - (void)addConstraintToToolbar {
@@ -840,4 +901,5 @@ UOneDownloadTableViewCellDelegate>
                                                                          constant:0];
     [self.view addConstraints:@[leadingConstraint, trailingConstraint, widthConstraint, heightConstraint, bottomConstraint]];
 }
+
 @end

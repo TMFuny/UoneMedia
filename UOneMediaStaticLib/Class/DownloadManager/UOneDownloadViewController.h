@@ -35,6 +35,8 @@
 -(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController didClickDownloadItemForStart:(nonnull WspxDownloadItem *)aDownloadItem;//开始下载
 -(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController didClickDownloadItemForResume:(nonnull WspxDownloadItem *)aDownloadItem;//继续下载
 
+-(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController dealWithNetworkNotReachableWhenResumeDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem;
+-(void)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController dealWithNetworkNotReachableWhenStartDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem;
 @end
 
 @protocol UoneDownloadViewControllerDataSource <NSObject>
@@ -47,16 +49,35 @@
 // Returning NO to do nothing
 //          YES to pause current downloadItem.
 - (BOOL)downloadViewController:(nonnull UOneDownloadViewController *)downloadViewController shouldPauseForDownloadItem:(nonnull WspxDownloadItem *)aDownloadItem; //是否需要暂停
+
+//-downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange: is called when device network Reachability Status Changed.
+// returning NO to do nothing.
+//           YES to auto dealwith netowork reachability status changed.
+// if you return NO, maby you want use those method to dealwith network status changed.
+//      - (void)disableUserInterfaceWithNetworkNotReachable;
+//      - (void)enableUserInterfaceWithNetworkReachable;
+- (BOOL)downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:(nonnull UOneDownloadViewController *)downloadViewController;
+
+//-downloadViewControllerShouldDownloadingWithReachabilityReachable: is called when user touch item for start/resum download.
+// return NO to custom the behaviour after user touched.
+//        YES will start/resum downloading item after user touched.
+// default start/resum downloading item after user touched.
+- (BOOL)downloadViewControllerShouldDownloadingWithReachabilityReachable:(nonnull UOneDownloadViewController *)downloadViewController;
 @end
 
 @interface UOneDownloadViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UOneDownloadTableViewCellDelegate>
 
+@property (nonatomic, assign, readonly) BOOL isUserInterfaceEnable;
 @property (nonnull, nonatomic, strong) IBOutlet UITableView* tableView;
 @property (nonnull, nonatomic, strong) IBOutlet UoneDownloadToolbar *fileManagerToolbar;
 @property (nonnull, nonatomic, strong) WspxDownloadManager* downloadManager;
 @property (nullable, assign) id <UoneDownloadViewControllerDelegate> delegate;
 @property (nullable, assign) id <UoneDownloadViewControllerDataSource> dataSource;
+
 - (void)presentOptionsMenu;
+- (void)disableUserInterfaceWithNetworkNotReachable;
+- (void)enableUserInterfaceWithNetworkReachable;
+
 - (void)showAlertViewWithTitle:(nullable NSString*)title
                        message:(nullable NSString*)message
                    cancelTitle:(nullable NSString*)cancelTitle
