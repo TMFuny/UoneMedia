@@ -12,6 +12,7 @@
 #import "UOneDownloadViewController.h"
 #import "UOneDownloadTableViewCell.h"
 #import <QuickLook/QuickLook.h>
+#import "WspxDownloadPreviewItem.h"
 #import "NSBundle+WspxUtility.h"
 #import "UoneDownloadToolbar.h"
 #import "WSPXAlertManager.h"
@@ -284,7 +285,7 @@ UOneDownloadTableViewCellDelegate>
         
         NSInteger row = indexPath.row;
         WspxDownloadItem* item = _downloadList[row];
-        
+        NSLog(@"downloadItem:%@", item);
         [(UOneDownloadTableViewCell*)cell resetWithDownloadItem:item];
         
     }
@@ -306,11 +307,16 @@ UOneDownloadTableViewCellDelegate>
     return 1;
 }
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    NSURL *fileURL = nil;
+    WspxDownloadPreviewItem *previewItem = [[WspxDownloadPreviewItem alloc] init];
+    
     NSIndexPath *selectedIndexPath = [self.tableView indexPathForSelectedRow];
     WspxDownloadItem *item = _downloadList[selectedIndexPath.row];
-    fileURL = item.localFileURL;
-    return fileURL;
+    previewItem.localFileUrl = item.localFileURL;
+    if (item.downloadSuggestedFileName && item.downloadSuggestedFileName.length != 0) {
+        
+        previewItem.title = item.downloadSuggestedFileName;
+    }
+    return previewItem;
 }
 
 #pragma mark - ThirdPartyDataSource and Delegate
@@ -435,6 +441,7 @@ UOneDownloadTableViewCellDelegate>
         NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
     }
 }
+
 - (void)onDownloadDidPending:(NSNotification *)aNotification {
     WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
     NSLog(@"onDownloadDidPending --> %@", aDownloadedItem);
@@ -620,7 +627,7 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)uoneDownloadToolbar:(UoneDownloadToolbar *)toolbar didClickedDoneButton:(UIButton *)button {
-    
+    [self enableUserInterfaceWithNetworkReachable];
     if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:DidClickToolBarForDone:)]) {
         [_delegate downloadViewController:self DidClickToolBarForDone:toolbar];
     }

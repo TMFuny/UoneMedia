@@ -110,12 +110,44 @@
     }
 }
 
+- (NSUInteger)getStringLengthOfString:(NSString *)str {
+    
+    NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+    NSData* da = [str dataUsingEncoding:enc];
+    return [da length];
+}
+
 - (void)resetWithDownloadItem : ( WspxDownloadItem * _Nonnull )aDownloadItem {
+    NSString *title = @"未知文件";
     if (aDownloadItem.downloadSuggestedFileName && [aDownloadItem.downloadSuggestedFileName length] != 0) {
-        self.fileLabel.text = aDownloadItem.downloadSuggestedFileName;
+        title = aDownloadItem.downloadSuggestedFileName;
     } else {
-        self.fileLabel.text = [self splitFilenameFromUrl:aDownloadItem.remoteURL.path];
+        title = [self splitFilenameFromUrl:aDownloadItem.remoteURL.path];
     }
+
+    if (isIPhone6sp || isIPhone6p || isIPhone6 || isIPhone6s) {
+        if ([self getStringLengthOfString:title] > 34) {
+            NSString *fileExt = [self splitExtFromFilename:title];
+            NSRange extRange = [title rangeOfString:fileExt];
+            if (extRange.location == 0 || extRange.location == NSNotFound) {
+                title = [NSString stringWithFormat:@"%@...",[title substringToIndex:30]];
+            } else {
+                title = [NSString stringWithFormat:@"%@...%@.%@",[title substringToIndex:18], [title substringWithRange:NSMakeRange(extRange.location - 2, 1)],fileExt];
+            }
+        }
+    } else {
+        if ([self getStringLengthOfString:title] > 24) {
+            NSString *fileExt = [self splitExtFromFilename:title];
+            NSRange extRange = [title rangeOfString:fileExt];
+            if (extRange.location == 0 || extRange.location == NSNotFound) {
+                title = [NSString stringWithFormat:@"%@...",[title substringToIndex:20]];
+            } else {
+                title = [NSString stringWithFormat:@"%@...%@.%@",[title substringToIndex:12], [title substringWithRange:NSMakeRange(extRange.location - 2, 1)],fileExt];
+            }
+        }
+    }
+    
+    self.fileLabel.text = title;
     
    NSMutableString *sizeString = [[self jointWithExpectedSize: aDownloadItem.expectedFileSizeInBytes receivedSize:aDownloadItem.receivedFileSizeInBytes] mutableCopy];
     self.iconImage.image = [self imageWithFileExt:[self splitExtFromFilename: self.fileLabel.text]];
@@ -147,6 +179,12 @@
         {
             NSRange deleteRange = [sizeString rangeOfString:@"/"];
             [sizeString deleteCharactersInRange:NSMakeRange(deleteRange.location, sizeString.length - deleteRange.location)];
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+            [dateFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
+            NSString *dateString = [dateFormatter stringFromDate:aDownloadItem.lastUpdateTime];
+            
+            [sizeString appendString:[NSString stringWithFormat:@" | %@", dateString]];
             self.downloadButton.state = kPKDownloadButtonState_Downloaded;
             break;
         }
@@ -171,7 +209,7 @@
         }
     }
 
-    if (downloadStatus == WspxDownloadItemStatusError) {
+    if (downloadStatus == WspxDownloadItemStatusError || downloadStatus == WspxDownloadItemStatusInterrupted) {
         [self.sizeLabel setAttributedText:[self toDownloadFailedAttributedSizeString]];
     } else {
          self.sizeLabel.text = sizeString;

@@ -524,6 +524,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         }
         else
         {
+            /*// 去掉文件大小的出错判断
             if (aFileSize < 40000)
             {
                 NSError *anError = nil;
@@ -538,6 +539,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
                 }
                 anIsValidFlag = NO;
             }
+            */
         }
     }
     return anIsValidFlag;

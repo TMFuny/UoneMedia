@@ -65,6 +65,10 @@
     {
         [aCoder encodeObject:self.downloadErrorMessagesStack forKey:@"downloadErrorMessagesStack"];
     }
+    if (self.lastUpdateTime)
+    {
+        [aCoder encodeObject:self.lastUpdateTime forKey:@"lastUpdateTime"];
+    }
     [aCoder encodeObject:@(self.expectedFileSizeInBytes) forKey:@"expectedFileSizeInBytes"];
     [aCoder encodeObject:@(self.lastHttpStatusCode) forKey:@"lastHttpStatusCode"];
 }
@@ -78,6 +82,7 @@
         self.downloadIdentifier = [aCoder decodeObjectForKey:@"downloadIdentifier"];
         self.remoteURL = [aCoder decodeObjectForKey:@"remoteURL"];
         self.localFileURL = [aCoder decodeObjectForKey:@"localFileURL"];
+        self.lastUpdateTime = [aCoder decodeObjectForKey:@"lastUpdateTime"];
         self.downloadSuggestedFileName = [aCoder decodeObjectForKey:@"downloadSuggestedFileName"];
         self.status = [[aCoder decodeObjectForKey:@"status"] unsignedIntegerValue];
         self.isSupportResumeWithoutRestart = [aCoder decodeBoolForKey:@"isSupportResumeWithoutRestart"];
@@ -102,6 +107,9 @@
     }
     if (self.localFileURL) {
         [aDescriptionDict setObject:self.localFileURL forKey:@"localFileURL"];
+    }
+    if (self.lastUpdateTime) {
+        [aDescriptionDict setObject:self.lastUpdateTime forKey:@"lastUpdateTime"];
     }
     [aDescriptionDict setObject:@(self.status) forKey:@"status"];
     [aDescriptionDict setObject:self.isSupportResumeWithoutRestart?@"YES":@"NO" forKey:@"isSupportResumeWithoutRestart"];
