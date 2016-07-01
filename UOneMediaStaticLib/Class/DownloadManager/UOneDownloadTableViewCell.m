@@ -36,7 +36,7 @@
     // Initialization code
     [self.fileLabel setFont:[UIFont systemFontOfSize:15]];
     [self.sizeLabel setFont:[UIFont systemFontOfSize:13]];
-    
+    self.fileLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     [self.fileLabel setTextColor:UIColorFromHex(0x565656)];
     [self.sizeLabel setTextColor:UIColorFromHex(0xbdbdbd)];
     [self initDownloadButton];
@@ -124,31 +124,9 @@
     } else {
         title = [self splitFilenameFromUrl:aDownloadItem.remoteURL.path];
     }
-    title = @"水电费水电费数量大幅减少了地方撒啊";//中文34个
+//    title = @"水电dsfdfsdfdfd费水电费数量大幅减少了地方撒啊";//中文34个
 //    title = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";//英文31个
     NSLog(@"stringLength:%ld",[self getStringLengthOfString:title]);
-    
-    if (isIPhone6sp || isIPhone6p || isIPhone6 || isIPhone6s) {
-        if ([self getStringLengthOfString:title] > 31) {
-            NSString *fileExt = [self splitExtFromFilename:title];
-            NSRange extRange = [title rangeOfString:fileExt];
-            if (extRange.location == 0 || extRange.location == NSNotFound) {
-                title = [NSString stringWithFormat:@"%@...",[title substringToIndex:10]];
-            } else {
-                title = [NSString stringWithFormat:@"%@...%@.%@",[title substringToIndex:18], [title substringWithRange:NSMakeRange(extRange.location - 2, 1)],fileExt];
-            }
-        }
-    } else {
-        if ([self getStringLengthOfString:title] > 24) {
-            NSString *fileExt = [self splitExtFromFilename:title];
-            NSRange extRange = [title rangeOfString:fileExt];
-            if (extRange.location == 0 || extRange.location == NSNotFound) {
-                title = [NSString stringWithFormat:@"%@...",[title substringToIndex:20]];
-            } else {
-                title = [NSString stringWithFormat:@"%@...%@.%@",[title substringToIndex:10], [title substringWithRange:NSMakeRange(extRange.location - 2, 1)],fileExt];
-            }
-        }
-    }
     
     self.fileLabel.text = title;
     
