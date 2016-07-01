@@ -747,7 +747,7 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
         }
         else
         {
-            aLocalDestinationFileURL = [HWIFileDownloader localFileURLForRemoteURL:aDownloadTask.originalRequest.URL];
+            aLocalDestinationFileURL = [HWIFileDownloader localFileURLForRemoteURL:aDownloadTask.originalRequest.URL withSuggestFileName:aDownloadItem.downloadSuggestedFileName];
         }
         if (aLocalDestinationFileURL)
         {
@@ -855,8 +855,17 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
             NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
             NSInteger aHttpStatusCode = aHttpResponse.statusCode;
             if (aHttpStatusCode == 206) {
-                aDownloadItem.isSupportResumeWithoutRestart = YES;
                 
+                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
+                NSDictionary * headlerFields = [httpResponse allHeaderFields];
+                NSString *cacheControl = nil;
+                cacheControl = [headlerFields objectForKey:@"Cache-Control"];
+                if (!cacheControl) {
+                    cacheControl = [headlerFields objectForKey:@"Cache-Controli"];
+                }
+                if ([cacheControl isEqualToString:@"public"]) {
+                    aDownloadItem.isSupportResumeWithoutRestart = YES;
+                }
             } else {
                 NSDictionary * headlerFields = [aHttpResponse allHeaderFields];
                 NSString *AcceptRanges = nil;
@@ -1038,7 +1047,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
             }
             else
             {
-                aLocalFileURL = [HWIFileDownloader localFileURLForRemoteURL:aConnection.originalRequest.URL];
+                aLocalFileURL = [HWIFileDownloader localFileURLForRemoteURL:aConnection.originalRequest.URL withSuggestFileName:aDownloadItem.downloadSuggestedFileName];
             }
             
             if (aLocalFileURL)
@@ -1355,7 +1364,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
 #pragma mark - HWIFileDownloadDelegate Defaults
 
 
-+ (nullable NSURL *)localFileURLForRemoteURL:(nonnull NSURL *)aRemoteURL
++ (nullable NSURL *)localFileURLForRemoteURL:(nonnull NSURL *)aRemoteURL withSuggestFileName:(NSString*)suggestFileName
 {
     NSURL *aLocalFileURL = nil;
     NSURL *aFileDownloadDirectoryURL = nil;
@@ -1381,12 +1390,18 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
                 }
             }
         }
-        NSString *aLocalFileName = [NSString stringWithFormat:@"%@.%@", [[NSUUID UUID] UUIDString], [[aRemoteURL lastPathComponent] pathExtension]];
+        NSString *fileExt = [[aRemoteURL lastPathComponent] pathExtension];
+        if ((!fileExt || fileExt.length == 0) && suggestFileName && suggestFileName.length != 0) {
+            NSArray * subStrings = [suggestFileName componentsSeparatedByString:@"."];
+            if (subStrings && subStrings > 1) {
+                fileExt = [subStrings lastObject];
+            }
+        }
+        NSString *aLocalFileName = [NSString stringWithFormat:@"%@.%@", [[NSUUID UUID] UUIDString], fileExt];
         aLocalFileURL = [aFileDownloadDirectoryURL URLByAppendingPathComponent:aLocalFileName isDirectory:NO];
     }
     return aLocalFileURL;
 }
-
 
 + (BOOL)httpStatusCode:(NSInteger)aHttpStatusCode isValidForDownloadIdentifier:(nonnull NSString *)aDownloadIdentifier
 {
@@ -1604,7 +1619,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
         NSNumber *freeFileSystemSizeInBytes = [dictionary objectForKey:NSFileSystemFreeSize];
         totalSpace = [fileSystemSizeInBytes unsignedLongLongValue];
         totalFreeSpace = [freeFileSystemSizeInBytes unsignedLongLongValue];
-        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll));
+//        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll));
     } else {
         NSLog(@"Error Obtaining System Memory Info: Domain = %@, Code = %ld", [error domain], (long)[error code]);
     }

@@ -83,5 +83,6 @@
                    cancelTitle:(nullable NSString*)cancelTitle
                   cancelAction:(void(^ __nullable)())cancelBlock
                   confirmTitle:(nullable NSString*)confirmTitle
-                 confirmAction:(void(^ __nullable)()) confirmBlock;
+                 confirmAction:(void(^ __nullable)()) confirmBlock
+            systemDefaultStyle:(BOOL)issystemDefaultStyle;
 @end

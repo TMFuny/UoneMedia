@@ -19,13 +19,29 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "UOneMediaStaticLib/Class/DownloadManager/UOneDownloadViewController.m"
-            timestampString = "488804096.585425"
+            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
+            timestampString = "488879040.070927"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "428"
-            endingLineNumber = "428"
-            landmarkName = "-onProgressDidChange:"
+            startingLineNumber = "395"
+            endingLineNumber = "395"
+            landmarkName = "-resumeDownloadWithIdentifier:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UOneMediaStaticLib/Class/ThirdParty/HWIFileDownload/HWIFileDownloader.m"
+            timestampString = "489062453.173878"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1237"
+            endingLineNumber = "1237"
+            landmarkName = "-connection:didReceiveData:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

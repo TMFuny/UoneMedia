@@ -76,13 +76,13 @@ UOneDownloadTableViewCellDelegate>
     UIImageView *emptyImageView1 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"UOneMedia.bundle/无下载任务"]];
     emptyImageView1.frame = CGRectMake(0, 80, kScreenWidth, 100);
     emptyImageView1.contentMode = UIViewContentModeScaleAspectFit;
-    /*
+    
     UILabel *tip1 = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(emptyImageView1.frame) + 20, kScreenWidth, 40)];
     tip1.text = @"暂无下载任务哦~";
     tip1.textAlignment = NSTextAlignmentCenter;
     tip1.textColor = UIColorFromHex(0xb9b9b9);
     [_blankView addSubview:tip1];
-    */
+    
     
     [_blankView addSubview:emptyImageView1];
     _blankView.backgroundColor = [UIColor clearColor];
@@ -357,7 +357,7 @@ UOneDownloadTableViewCellDelegate>
         if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:isComfirmToDeleteDownloads:)]) {
             [_delegate downloadViewController:weakSelf isComfirmToDeleteDownloads:YES];
         }
-    }];
+    } systemDefaultStyle:YES];
 }
 
 #pragma mark - CustomDataSource and Delegate
@@ -414,7 +414,7 @@ UOneDownloadTableViewCellDelegate>
 
 - (void)onProgressDidChange:(NSNotification *)aNotification {
     WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
-    NSLog(@"onProgressDidChange --> %@", aDownloadedItem);
+//    NSLog(@"onProgressDidChange --> %@", aDownloa®dedItem);
     
     NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
         if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
@@ -703,7 +703,8 @@ UOneDownloadTableViewCellDelegate>
                 [_delegate downloadViewController:weakSelf isComfirmToDeleteDownloads:YES];
             }
         });
-    }];
+    }
+              systemDefaultStyle:YES];
 }
 #pragma mark - Target-Action Event
 #pragma mark - PublicMethod
@@ -730,7 +731,8 @@ UOneDownloadTableViewCellDelegate>
                                  cancelTitle:@"知道了"
                                 cancelAction:nil
                                 confirmTitle:nil
-                               confirmAction:nil];
+                               confirmAction:nil
+                          systemDefaultStyle:NO];
             }
         }
     });
@@ -798,7 +800,8 @@ UOneDownloadTableViewCellDelegate>
                    cancelTitle:(nullable NSString*)cancelTitle
                   cancelAction:(void(^ __nullable)())cancelBlock
                   confirmTitle:(nullable NSString*)confirmTitle
-                 confirmAction:(void(^ __nullable)()) confirmBlock {
+                 confirmAction:(void(^ __nullable)()) confirmBlock
+            systemDefaultStyle:(BOOL)isSystemDefaultStyle {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             
@@ -814,23 +817,35 @@ UOneDownloadTableViewCellDelegate>
                                                                       }
                                                                   }];
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
-                                                                   style:UIAlertActionStyleCancel
+                                                                   style:isSystemDefaultStyle?UIAlertActionStyleCancel:UIAlertActionStyleDefault
                                                                  handler:^(UIAlertAction * _Nonnull action) {
                                                                      if (cancelBlock) {
                                                                          cancelBlock();
                                                                      }
                                                                  }];
-            [alertController addAction:confirmAction];
             [alertController addAction:cancelAction];
+            [alertController addAction:confirmAction];
             [self presentViewController:alertController animated:YES completion:nil];
         } else {
             _alertManager = [[WSPXAlertManager alloc] init];
+            NSMutableArray *buttonTitles = [[NSMutableArray alloc] init];
             
-            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:title
-                                                                message:message
-                                                               delegate:nil
-                                                      cancelButtonTitle:cancelTitle
-                                                      otherButtonTitles: confirmTitle, nil];
+            UIAlertView* alertView = nil;
+            
+            if (isSystemDefaultStyle) {
+                 alertView = [[UIAlertView alloc] initWithTitle:title
+                                                        message:message
+                                                       delegate:nil
+                                              cancelButtonTitle:cancelTitle
+                                              otherButtonTitles:confirmTitle, nil];
+            } else {
+                
+                 alertView = [[UIAlertView alloc] initWithTitle:title
+                                                        message:message
+                                                       delegate:nil
+                                              cancelButtonTitle:nil
+                                              otherButtonTitles: cancelTitle, confirmTitle, nil];
+            }
             alertView.didClickedButtonHandler = ^BOOL(UIAlertView* alertView, NSInteger buttonIndex) {
                 if (buttonIndex == 1) {
                     if (confirmBlock) {

@@ -194,7 +194,8 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         }
         else
         {
-            [self startDownloadWithItem:aDownloadItem];
+            [self resumeDownloadWithIdentifier:aDownloadItem.downloadIdentifier];
+//            [self startDownloadWithItem:aDownloadItem];
         }
     }
     else
@@ -377,7 +378,11 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         // download status heuristics
         if ((aFailedDownloadItem.status != WspxDownloadItemStatusPaused) && (aFailedDownloadItem.status != WspxDownloadItemStatusDeleted)) {
             if (aResumeData.length > 0) {
-                aFailedDownloadItem.status = WspxDownloadItemStatusInterrupted;
+                if (anError.code == NSURLErrorCancelled) {
+                    aFailedDownloadItem.status = WspxDownloadItemStatusPaused;
+                } else {
+                    aFailedDownloadItem.status = WspxDownloadItemStatusInterrupted;
+                }
             } else if ([anError.domain isEqualToString:NSURLErrorDomain] && (anError.code == NSURLErrorCancelled)) {
                 aFailedDownloadItem.status = WspxDownloadItemStatusCancelled;
             } else {
@@ -457,6 +462,9 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
             }
         }
     }
+    
+    [self storeDownloadItems];
+    NSLog(@"downloadProgressChanged:%@",aChangedDownloadItem);
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadProgressChangedNotification object:aChangedDownloadItem];
 }
 
@@ -613,7 +621,6 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         totalFreeSpace = [freeFileSystemSizeInBytes unsignedLongLongValue];
         totalSpaceString = [NSString stringWithFormat:@"%.1f",(((totalSpace/1024ll)/1024ll)/1024.0)];
         totalFreeSpaceString = [NSString stringWithFormat:@"%.1f",(((totalFreeSpace/1024ll)/1024ll)/1024.0)];
-        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll));
     } else {
         NSLog(@"Error Obtaining System Memory Info: Domain = %@, Code = %ld", [error domain], (long)[error code]);
     }
