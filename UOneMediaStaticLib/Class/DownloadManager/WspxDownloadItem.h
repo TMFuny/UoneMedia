@@ -42,6 +42,7 @@ typedef NS_ENUM(NSUInteger, WspxDownloadItemStatus) {
 @property (nonatomic, readonly) float downloadProgress;
 @property (nonatomic, assign, readonly) NSUInteger bytesPerSecondSpeed;
 @property (nonatomic, strong, nullable) NSDate * lastUpdateTime;
+@property (nonatomic, assign) NSTimeInterval downloadMaxAge;
 @property (nonatomic, strong, nullable) NSString *downloadSuggestedFileName;
 @property (nonatomic, assign) BOOL isSupportResumeWithoutRestart;
 @end

@@ -178,37 +178,37 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 #pragma mark - Network Flag Handling
 
-- (NetworkStatus)localWiFiStatusForFlags:(SCNetworkReachabilityFlags)flags
+- (UOMNetworkStatus)localWiFiStatusForFlags:(SCNetworkReachabilityFlags)flags
 {
 	PrintReachabilityFlags(flags, "localWiFiStatusForFlags");
-	NetworkStatus returnValue = NotReachable;
+	UOMNetworkStatus returnValue = UOMNotReachable;
 
 	if ((flags & kSCNetworkReachabilityFlagsReachable) && (flags & kSCNetworkReachabilityFlagsIsDirect))
 	{
-		returnValue = ReachableViaWiFi;
+		returnValue = UOMReachableViaWiFi;
 	}
     
 	return returnValue;
 }
 
 
-- (NetworkStatus)networkStatusForFlags:(SCNetworkReachabilityFlags)flags
+- (UOMNetworkStatus)networkStatusForFlags:(SCNetworkReachabilityFlags)flags
 {
 	PrintReachabilityFlags(flags, "networkStatusForFlags");
 	if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
 	{
 		// The target host is not reachable.
-		return NotReachable;
+		return UOMNotReachable;
 	}
 
-    NetworkStatus returnValue = NotReachable;
+    UOMNetworkStatus returnValue = UOMNotReachable;
 
 	if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0)
 	{
 		/*
          If the target host is reachable and no connection is required then we'll assume (for now) that you're on Wi-Fi...
          */
-		returnValue = ReachableViaWiFi;
+		returnValue = UOMReachableViaWiFi;
 	}
 
 	if ((((flags & kSCNetworkReachabilityFlagsConnectionOnDemand ) != 0) ||
@@ -223,7 +223,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             /*
              ... and no [user] intervention is needed...
              */
-            returnValue = ReachableViaWiFi;
+            returnValue = UOMReachableViaWiFi;
         }
     }
 
@@ -232,7 +232,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 		/*
          ... but WWAN connections are OK if the calling application is using the CFNetwork APIs.
          */
-		returnValue = ReachableViaWWAN;
+		returnValue = UOMReachableViaWWAN;
 	}
     
 	return returnValue;
@@ -253,10 +253,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 
-- (NetworkStatus)currentReachabilityStatus
+- (UOMNetworkStatus)currentReachabilityStatus
 {
 	NSAssert(_reachabilityRef != NULL, @"currentNetworkStatus called with NULL SCNetworkReachabilityRef");
-	NetworkStatus returnValue = NotReachable;
+	UOMNetworkStatus returnValue = UOMNotReachable;
 	SCNetworkReachabilityFlags flags;
     
 	if (SCNetworkReachabilityGetFlags(_reachabilityRef, &flags))

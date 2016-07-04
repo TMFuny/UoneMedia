@@ -8,20 +8,29 @@
 
 #import <Foundation/Foundation.h>
 #import "WspxDownloadItem.h"
-
+#import "UOMReachability.h"
 
 extern NSString* _Nonnull const wspxDownloadDidCompleteNotification;
-extern NSString* _Nonnull const wspxDownloadDidPendingNotification;
 extern NSString* _Nonnull const wspxDownloadProgressChangedNotification;
 extern NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification;
 extern NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification;
 @class WspxDownloadItem;
 
+@protocol WspxDownloadManagerDelegate <NSObject>
+
+- (void)downloadProgressDidChangedWithItem:(nonnull WspxDownloadItem *)aChangedDownloadItem;
+- (void)downloadProgressDidCompleteWithItem:(nonnull WspxDownloadItem *)aCompletedDownloadItem;
+- (void)downloadProgressDidPendingWithItem:(nonnull WspxDownloadItem *)aPendingDownloadItem;
+@optional
+- (void)downloadProgressReachableChanged:(nonnull UOMReachability *)reachability;
+@end
+
+
 @interface WspxDownloadManager : NSObject
 
 @property(nonnull, nonatomic, strong) NSMutableArray<WspxDownloadItem *> *downloadItems;
-
-
+@property(nullable, nonatomic, weak) id<WspxDownloadManagerDelegate>delegate;
+@property (nonatomic, readonly) UOMReachability *internetReachability;
 
 
 + (nonnull instancetype) shareInstance;

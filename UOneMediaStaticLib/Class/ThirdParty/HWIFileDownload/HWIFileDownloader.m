@@ -61,7 +61,7 @@
 
 - (nullable instancetype)initWithDelegate:(nonnull NSObject<HWIFileDownloadDelegate>*)aDelegate
 {
-    return [self initWithDelegate:aDelegate maxConcurrentDownloads:-1];
+    return [self initWithDelegate:aDelegate maxConcurrentDownloads:4];
 }
 
 
@@ -188,8 +188,8 @@
 - (void)startDownloadWithIdentifier:(nonnull NSString *)aDownloadIdentifier
                       fromRemoteURL:(nonnull NSURL *)aRemoteURL
 {
-    [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
-//    [self startDataTaskWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
+//    [self startDownloadWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
+    [self startDataTaskWithDownloadToken:aDownloadIdentifier fromRemoteURL:aRemoteURL usingResumeData:nil];
 }
 
 
@@ -205,7 +205,7 @@
     NSUInteger aDownloadID = 0;
     
     if (aResumeData) {
-        [self startDataTaskWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:aResumeData];
+        [self startDownloadWithDownloadToken:aDownloadToken fromRemoteURL:aRemoteURL usingResumeData:aResumeData];
     } else {
         if (![self.deActiveDownloadsArray containsObject:aDownloadToken]) {
             [self resumDataTaskWithRemoteURL:aRemoteURL downloadID:aDownloadID DownloadToken:aDownloadToken];
@@ -231,6 +231,7 @@
 
             aDataTask = [[NSURLSession sharedSession] dataTaskWithRequest:dataRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                 NSLog(@"responseHeaderFields:%@ data:%@",response, data);
+                [self handleDownloadWithResponse:response Identifier:aDownloadToken];
                 if ([response expectedContentLength] != -1) {
                     if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
                         
@@ -241,11 +242,17 @@
                     } else {
                         if ([self.deActiveDownloadsArray containsObject:aDownloadToken]) {
                             [self startDownloadWithIdentifier:aDownloadToken fromRemoteURL:aRemoteURL];
+                            if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressDidStartWithIdentifier:)]) {
+                                [self.fileDownloadDelegate downloadProgressDidStartWithIdentifier:aDownloadToken];
+                            }
                         }
                     }
                 } else {//不知道文件长度的也继续下载
                     if ([self.deActiveDownloadsArray containsObject:aDownloadToken]) {
                         [self startDownloadWithIdentifier:aDownloadToken fromRemoteURL:aRemoteURL];
+                        if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressDidStartWithIdentifier:)]) {
+                            [self.fileDownloadDelegate downloadProgressDidStartWithIdentifier:aDownloadToken];
+                        }
                     }
                 }
                 [aDataTask cancel];
@@ -694,6 +701,8 @@
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
      NSLog(@"responseHeaderFields:%@",response);
+    [self handleDownloadWithResponse:response Identifier:dataTask.taskDescription];
+    
     if ([response expectedContentLength] != -1) {
         if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
             
@@ -704,12 +713,18 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
         } else {
             if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
                 [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
+                if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressDidStartWithIdentifier:)]) {
+                    [self.fileDownloadDelegate downloadProgressDidStartWithIdentifier:dataTask.taskDescription];
+                }
             }
         }
         completionHandler(NSURLSessionResponseCancel);
     } else {//不知道文件长度的也继续下载
         if ([self.deActiveDownloadsArray containsObject:dataTask.taskDescription]) {
             [self startDownloadWithIdentifier:dataTask.taskDescription fromRemoteURL:dataTask.originalRequest.URL];
+            if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressDidStartWithIdentifier:)]) {
+                [self.fileDownloadDelegate downloadProgressDidStartWithIdentifier:dataTask.taskDescription];
+            }
         }
         completionHandler(NSURLSessionResponseCancel);
     }
@@ -834,6 +849,14 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 
 - (void)URLSession:(nonnull NSURLSession *)aSession downloadTask:(nonnull NSURLSessionDownloadTask *)aDownloadTask didWriteData:(int64_t)aBytesWrittenCount totalBytesWritten:(int64_t)aTotalBytesWrittenCount totalBytesExpectedToWrite:(int64_t)aTotalBytesExpectedToWriteCount
 {
+    HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadTask.taskIdentifier)];
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+    if(currentTime < aDownloadItem.lastChangeTime + 1){
+        return;
+    }else{
+        aDownloadItem.lastChangeTime = currentTime;
+    }
+    
     if ([aDownloadTask.response expectedContentLength] != -1) {
         if ([aDownloadTask.response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
             
@@ -843,41 +866,13 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
             }
         }
     }
-    
-    HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadTask.taskIdentifier)];
     if (aDownloadItem)
     {
         if (aDownloadItem.downloadStartDate == nil)
         {
             aDownloadItem.downloadStartDate = [NSDate date];
         }
-        if ([aDownloadTask.response isKindOfClass:[NSHTTPURLResponse class]]) {
-            NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
-            NSInteger aHttpStatusCode = aHttpResponse.statusCode;
-            if (aHttpStatusCode == 206) {
-                
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
-                NSDictionary * headlerFields = [httpResponse allHeaderFields];
-                NSString *cacheControl = nil;
-                cacheControl = [headlerFields objectForKey:@"Cache-Control"];
-                if (!cacheControl) {
-                    cacheControl = [headlerFields objectForKey:@"Cache-Controli"];
-                }
-                if ([cacheControl isEqualToString:@"public"]) {
-                    aDownloadItem.isSupportResumeWithoutRestart = YES;
-                }
-            } else {
-                NSDictionary * headlerFields = [aHttpResponse allHeaderFields];
-                NSString *AcceptRanges = nil;
-                
-                AcceptRanges = [headlerFields objectForKey:@"Accept-Ranges"];
-                
-                if ([AcceptRanges isEqualToString:@"bytes"]) {
-                    aDownloadItem.isSupportResumeWithoutRestart = YES;
-                }
-            }
-        }
-
+        
         aDownloadItem.receivedFileSizeInBytes = aTotalBytesWrittenCount;
         aDownloadItem.expectedFileSizeInBytes = aTotalBytesExpectedToWriteCount;
         NSString *suggesFileName = aDownloadTask.response.suggestedFilename;
@@ -1507,6 +1502,22 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
     return suggestedFileName;
 }
 
+- (NSDate *)downloadItemStartedDateForDownloadID:(NSString *)aDownloadIdentifier {
+    NSDate *startedDate = nil;
+    
+    NSInteger aDownloadID = [self downloadIDForActiveDownloadToken:aDownloadIdentifier];
+    if (aDownloadID > -1)
+    {
+        HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadID)];
+        
+        if (aDownloadItem) {
+            startedDate = aDownloadItem.downloadStartDate;
+        }
+    }
+    
+    return startedDate;
+}
+
 - (BOOL)isSupportResumeWithoutRestartForDownloadID:(nonnull NSString *)aDownloadIdentifier {
     BOOL isSupportResumeWithoutRestart = NO;
     
@@ -1524,6 +1535,50 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
 }
 #pragma mark - Utilities
 
+- (void)handleDownloadWithResponse:(NSURLResponse*)response Identifier:(nonnull NSString*)indetifier{
+    if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+        NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)response;
+        NSInteger aHttpStatusCode = aHttpResponse.statusCode;
+        if (aHttpStatusCode == 206) {
+            
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSDictionary * headlerFields = [httpResponse allHeaderFields];
+            NSString *cacheControl = nil;
+            cacheControl = [headlerFields objectForKey:@"Cache-Control"];
+            if (!cacheControl) {
+                cacheControl = [headlerFields objectForKey:@"Cache-Controli"];
+            }
+            NSRange maxAgeRange = [cacheControl rangeOfString:@"max-age="];
+            if (cacheControl && maxAgeRange.location != NSNotFound) {
+                NSInteger maxAgeSec = [[cacheControl substringFromIndex:maxAgeRange.length] integerValue];
+                NSLog(@"maxAgeSec:%llu", maxAgeSec);
+                if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressIsSupportResumeWithIdentifier:maxAge:)]) {
+                    [self.fileDownloadDelegate downloadProgressIsSupportResumeWithIdentifier:indetifier maxAge:maxAgeSec];
+                }
+            } else {
+                NSString *AcceptRanges = nil;
+                
+                AcceptRanges = [headlerFields objectForKey:@"Accept-Ranges"];
+                if ([AcceptRanges isEqualToString:@"bytes"]) {
+                    if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressIsSupportResumeWithIdentifier:maxAge:)]) {
+                        [self.fileDownloadDelegate downloadProgressIsSupportResumeWithIdentifier:indetifier maxAge:MAXFLOAT];
+                    }
+                }
+            }
+        } else {
+            NSDictionary * headlerFields = [aHttpResponse allHeaderFields];
+            NSString *AcceptRanges = nil;
+            
+            AcceptRanges = [headlerFields objectForKey:@"Accept-Ranges"];
+            
+            if ([AcceptRanges isEqualToString:@"bytes"]) {
+                if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressIsSupportResumeWithIdentifier:maxAge:)]) {
+                    [self.fileDownloadDelegate downloadProgressIsSupportResumeWithIdentifier:indetifier maxAge:MAXFLOAT];
+                }
+            }
+        }
+    }
+}
 
 - (NSInteger)downloadIDForActiveDownloadToken:(nonnull NSString *)aDownloadToken
 {

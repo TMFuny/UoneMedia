@@ -12,10 +12,10 @@
 
 
 typedef enum : NSInteger {
-	NotReachable = 0,
-	ReachableViaWiFi,
-	ReachableViaWWAN
-} NetworkStatus;
+	UOMNotReachable = 0,
+	UOMReachableViaWiFi,
+	UOMReachableViaWWAN
+} UOMNetworkStatus;
 
 
 extern NSString *kUoneReachabilityChangedNotification;
@@ -49,7 +49,7 @@ extern NSString *kUoneReachabilityChangedNotification;
 - (BOOL)startNotifier;
 - (void)stopNotifier;
 
-- (NetworkStatus)currentReachabilityStatus;
+- (UOMNetworkStatus)currentReachabilityStatus;
 
 /*!
  * WWAN may be available, but not active until a connection has been established. WiFi may require a connection for VPN on Demand.

@@ -11,10 +11,10 @@
 #import "HWIFileDownloader.h"
 #import "HWIFileDownloadItem.h"
 
+
 static void *WspxDownloadManagerProgressObserverContext = &WspxDownloadManagerProgressObserverContext;
 
 NSString* _Nonnull const wspxDownloadDidCompleteNotification            = @"wspxDownloadDidCompleteNotification";
-NSString* _Nonnull const wspxDownloadDidPendingNotification             = @"wspxDownloadDidPendingNotification";
 NSString* _Nonnull const wspxDownloadProgressChangedNotification        = @"wspxDownloadProgressChangedNotification";
 NSString* _Nonnull const wspxTotalDownloadProgressChangedNotification   = @"wspxTotalDownloadProgressChangedNotification";
 NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspxDownloadDiskStorageNotEnoughNotification";
@@ -22,7 +22,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 @interface WspxDownloadManager() <HWIFileDownloadDelegate>
 
 @property(nonnull, nonatomic, strong) HWIFileDownloader *fileDownloader;
-
+@property (nonatomic, readwrite) UOMReachability *internetReachability;
 @end
 
 @implementation WspxDownloadManager
@@ -47,6 +47,10 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     self = [super init];
     if (self)
     {
+        self.internetReachability = [UOMReachability reachabilityForInternetConnection];
+        [self.internetReachability startNotifier];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kUoneReachabilityChangedNotification object:nil];
+        
         _networkActivityIndicatorCount = 0;
         
         _progress = [NSProgress progressWithTotalUnitCount:0];
@@ -67,7 +71,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         }
         else
         {
-            _fileDownloader = [[HWIFileDownloader alloc] initWithDelegate:self maxConcurrentDownloads:1];
+            _fileDownloader = [[HWIFileDownloader alloc] initWithDelegate:self maxConcurrentDownloads:4];
         }
         [self.fileDownloader setupWithCompletion:nil];
 
@@ -158,12 +162,8 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         BOOL isDownloading = [_fileDownloader isDownloadingIdentifier:aDownloadItem.downloadIdentifier];
         if (isDownloading == NO)
         {
-            aDownloadItem.status = WspxDownloadItemStatusPending;
+            aDownloadItem.status = WspxDownloadItemStatusNotStarted;
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDidPendingNotification object:aDownloadItem];
-            });
             [self storeDownloadItems];
             
             // kick off individual download
@@ -195,12 +195,11 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         else
         {
             [self resumeDownloadWithIdentifier:aDownloadItem.downloadIdentifier];
-//            [self startDownloadWithItem:aDownloadItem];
         }
     }
     else
     {
-        [self startDownloadWithItem:aDownloadItem];
+        [self resumeDownloadWithIdentifier:aDownloadItem.downloadIdentifier];
     }
 
 }
@@ -272,6 +271,7 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         }
     }
 }
+
 #pragma mark - Remove Download Item
 
 - (void)removeDownloadWithItem:(nonnull WspxDownloadItem*)aRemoveDownloadItem {
@@ -332,6 +332,13 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     [self toggleNetworkActivityIndicatorVisible:NO];
 }
 
+- (void)reachabilityChanged:(NSNotification *)note {
+
+    UOMReachability* curReach = [note object];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(downloadProgressReachableChanged:)]) {
+        [self.delegate downloadProgressReachableChanged:curReach];
+    }
+}
 
 - (void)downloadDidCompleteWithIdentifier:(nonnull NSString *)aDownloadIdentifier
                              localFileURL:(nonnull NSURL *)aLocalFileURL {
@@ -352,6 +359,9 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         [self storeDownloadItems];
     } else {
         NSLog(@"ERR: Completed download item not found (id: %@) (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(downloadProgressDidCompleteWithItem:)]) {
+        [self.delegate downloadProgressDidCompleteWithItem:aCompletedDownloadItem];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDidCompleteNotification object:aCompletedDownloadItem];
 }
@@ -412,6 +422,9 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
         NSLog(@"ERR: Failed download item not found (id: %@) (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
     }
     
+    if (self.delegate && [self.delegate respondsToSelector:@selector(downloadProgressDidCompleteWithItem:)]) {
+        [self.delegate downloadProgressDidCompleteWithItem:aFailedDownloadItem];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDidCompleteNotification object:aFailedDownloadItem];
     
 }
@@ -420,6 +433,27 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
 
 #pragma mark HWIFileDownloadDelegate (optional)
 
+- (void)downloadProgressIsSupportResumeWithIdentifier:(NSString *)aDownloadIdentifier maxAge:(NSTimeInterval)maxAge{
+    NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aDownloadItem.downloadIdentifier isEqualToString:aDownloadIdentifier])
+        {
+            return YES;
+        }
+        return NO;
+    }];
+    if (aFoundDownloadItemIndex != NSNotFound)
+    {
+        NSLog(@"INFO: Download max-age - :%llu id: %@ (%@, %d)", maxAge, aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+        
+        WspxDownloadItem *aStartedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
+        aStartedDownloadItem.downloadMaxAge = maxAge;
+        [self storeDownloadItems];
+    }
+    else
+    {
+        NSLog(@"ERR: Download max-age item not found (id: %@) (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+}
 
 - (void)downloadProgressChangedForIdentifier:(nonnull NSString *)aDownloadIdentifier
 {
@@ -434,10 +468,9 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     if (aFoundDownloadItemIndex != NSNotFound)
     {
         aChangedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
-        if (aChangedDownloadItem.status == WspxDownloadItemStatusPending)
-        {
-            aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
-        }
+        
+        aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
+        
         
         if (!aChangedDownloadItem.downloadSuggestedFileName) {
             aChangedDownloadItem.downloadSuggestedFileName = [_fileDownloader downloadItemSuggestedFileNameForDownloadID:aDownloadIdentifier];
@@ -464,8 +497,36 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     }
     
     [self storeDownloadItems];
-    NSLog(@"downloadProgressChanged:%@",aChangedDownloadItem);
+    if (self.delegate && [self.delegate respondsToSelector:@selector(downloadProgressDidChangedWithItem:)]) {
+        [self.delegate downloadProgressDidChangedWithItem:aChangedDownloadItem];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadProgressChangedNotification object:aChangedDownloadItem];
+}
+
+- (void)downloadProgressDidStartWithIdentifier:(NSString *)aDownloadIdentifier {
+    NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aDownloadItem.downloadIdentifier isEqualToString:aDownloadIdentifier])
+        {
+            return YES;
+        }
+        return NO;
+    }];
+    if (aFoundDownloadItemIndex != NSNotFound)
+    {
+        NSLog(@"INFO: Download started - id: %@ (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+        
+        WspxDownloadItem *aStartedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
+        aStartedDownloadItem.status = WspxDownloadItemStatusPending;
+        [self storeDownloadItems];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(downloadProgressDidPendingWithItem:)]) {
+            [self.delegate downloadProgressDidPendingWithItem:aStartedDownloadItem];
+        }
+    }
+    else
+    {
+        NSLog(@"ERR: Pownload started item not found (id: %@) (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+    
 }
 
 - (void)downloadPausedWithIdentifier:(nonnull NSString *)aDownloadIdentifier
@@ -645,8 +706,13 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     if (!resumeDictionary || error) return NO;
     
     NSString *localFilePath = [resumeDictionary objectForKey:@"NSURLSessionResumeInfoLocalPath"];
-    if ([localFilePath length] < 1) return NO;
-    
+    NSString *tempFileName = [resumeDictionary objectForKey:@"NSURLSessionResumeInfoTempFileName"];
+    if (localFilePath == nil && tempFileName == nil) {
+        return NO;
+    }
+    if (tempFileName) {
+        return YES;
+    }
     return [[NSFileManager defaultManager] fileExistsAtPath:localFilePath];
 }
 @end

@@ -14,4 +14,13 @@
 
 #import "NSBundle+WspxUtility.h"
 #import "UoneUtilsDefine.h"
+#ifdef DEBUG
+
+#define NSLog(...) NSLog(__VA_ARGS__)
+
+#else
+
+#define NSLog(...)
+
+#endif
 #endif /* WebViewDemo_Prefix_pch */

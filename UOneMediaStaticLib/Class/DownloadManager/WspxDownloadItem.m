@@ -34,6 +34,7 @@
         self.isSupportResumeWithoutRestart = NO;
         self.status = WspxDownloadItemStatusNotStarted;
         self.lastUpdateTime = nil;
+        self.downloadMaxAge = 0;
     }
     return self;
 }
@@ -69,6 +70,9 @@
     {
         [aCoder encodeObject:self.lastUpdateTime forKey:@"lastUpdateTime"];
     }
+    
+    [aCoder encodeObject:@(self.downloadMaxAge) forKey:@"downloadMaxAge"];
+    
     [aCoder encodeObject:@(self.expectedFileSizeInBytes) forKey:@"expectedFileSizeInBytes"];
     [aCoder encodeObject:@(self.lastHttpStatusCode) forKey:@"lastHttpStatusCode"];
 }
@@ -83,6 +87,7 @@
         self.remoteURL = [aCoder decodeObjectForKey:@"remoteURL"];
         self.localFileURL = [aCoder decodeObjectForKey:@"localFileURL"];
         self.lastUpdateTime = [aCoder decodeObjectForKey:@"lastUpdateTime"];
+        self.downloadMaxAge = [[aCoder decodeObjectForKey:@"downloadMaxAge"] integerValue];
         self.downloadSuggestedFileName = [aCoder decodeObjectForKey:@"downloadSuggestedFileName"];
         self.status = [[aCoder decodeObjectForKey:@"status"] unsignedIntegerValue];
         self.isSupportResumeWithoutRestart = [aCoder decodeBoolForKey:@"isSupportResumeWithoutRestart"];
@@ -111,6 +116,9 @@
     if (self.lastUpdateTime) {
         [aDescriptionDict setObject:self.lastUpdateTime forKey:@"lastUpdateTime"];
     }
+    
+    [aDescriptionDict setObject:@(self.downloadMaxAge) forKey:@"downloadMaxAge"];
+    
     [aDescriptionDict setObject:@(self.status) forKey:@"status"];
     [aDescriptionDict setObject:self.isSupportResumeWithoutRestart?@"YES":@"NO" forKey:@"isSupportResumeWithoutRestart"];
     if (self.progress)

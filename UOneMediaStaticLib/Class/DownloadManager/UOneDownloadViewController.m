@@ -16,7 +16,7 @@
 #import "NSBundle+WspxUtility.h"
 #import "UoneDownloadToolbar.h"
 #import "WSPXAlertManager.h"
-#import "UOMReachability.h"
+
 
 
 @interface UOneDownloadViewController ()<QLPreviewControllerDataSource,
@@ -24,10 +24,11 @@ QLPreviewControllerDelegate,
 UIDocumentInteractionControllerDelegate,
 UoneDownloadToolbarDelegate,
 SWTableViewCellDelegate,
-UOneDownloadTableViewCellDelegate>
+UOneDownloadTableViewCellDelegate,
+WspxDownloadManagerDelegate>
 @property (nonatomic, strong) UIDocumentInteractionController *docInteractionController;
 @property (nonatomic, assign, readwrite) BOOL isUserInterfaceEnable;
-@property (nonatomic) UOMReachability *internetReachability;
+
 @end
 
 @implementation UOneDownloadViewController
@@ -54,6 +55,7 @@ UOneDownloadTableViewCellDelegate>
   
     // Do any additional setup after loading the view from its nib.
     self.downloadManager = [WspxDownloadManager shareInstance];
+    self.downloadManager.delegate = self;
     _selectedIndexSet = [NSMutableIndexSet indexSet];
     _downloadList = [[NSMutableArray alloc] init];
     _deleteList = [[NSMutableArray alloc] init];
@@ -125,10 +127,9 @@ UOneDownloadTableViewCellDelegate>
     
     [self registerNotification];
 
-    self.internetReachability = [UOMReachability reachabilityForInternetConnection];
-    [self.internetReachability startNotifier];
-    NetworkStatus status = self.internetReachability.currentReachabilityStatus;
-    if (status == NotReachable) {
+    
+    UOMNetworkStatus status = self.downloadManager.internetReachability.currentReachabilityStatus;
+    if (status == UOMNotReachable) {
         _isUserInterfaceEnable = NO;
     } else {
         _isUserInterfaceEnable = YES;
@@ -286,11 +287,15 @@ UOneDownloadTableViewCellDelegate>
         NSInteger row = indexPath.row;
         WspxDownloadItem* item = _downloadList[row];
         NSLog(@"downloadItem:%@", item);
+        
         [(UOneDownloadTableViewCell*)cell resetWithDownloadItem:item];
         
     }
 }
 
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+}
 #pragma mark UIDocumentInteractionControllerDelegate
 - (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller {
     if (self.navigationController) {
@@ -364,10 +369,6 @@ UOneDownloadTableViewCellDelegate>
 #pragma mark WspxDownloadManager Notification
 
 - (void)registerNotification {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kUoneReachabilityChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidComplete:) name:wspxDownloadDidCompleteNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onProgressDidChange:) name:wspxDownloadProgressChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDownloadDidPending:) name:wspxDownloadDidPendingNotification object:nil];
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTotalProgressDidChange:) name:wspxTotalDownloadProgressChangedNotification object:nil];
@@ -376,10 +377,6 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)unregisterNotification {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kUoneReachabilityChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidCompleteNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadProgressChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxDownloadDidPendingNotification object:nil];
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:wspxTotalDownloadProgressChangedNotification object:nil];
@@ -387,8 +384,7 @@ UOneDownloadTableViewCellDelegate>
     return;
 }
 
-- (void)onDownloadDidComplete:(NSNotification *)aNotification {
-    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
+- (void)downloadProgressDidCompleteWithItem:(WspxDownloadItem *)aDownloadedItem {
     NSLog(@"onDownloadDidComplete --> %@", aDownloadedItem);
     NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
         if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier])
@@ -412,38 +408,41 @@ UOneDownloadTableViewCellDelegate>
     }
 }
 
-- (void)onProgressDidChange:(NSNotification *)aNotification {
-    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
-//    NSLog(@"onProgressDidChange --> %@", aDownloa®dedItem);
-    
-    NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
-        if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
-            return YES;
-        }
-        return NO;
-    }];
-    
-    if (aFoundDownloadItemIndex != NSNotFound) {
-        NSTimeInterval lastChangedUpdateDelta = 10.0;
-        if (aDownloadedItem.lastUpdateTime)
-        {
-            lastChangedUpdateDelta = [[NSDate date] timeIntervalSinceDate:aDownloadedItem.lastUpdateTime];
-        }
-        if (lastChangedUpdateDelta > 0.25) {
-            NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
-            if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
-                UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
-                [cell resetWithDownloadItem:aDownloadedItem];
+- (void)downloadProgressDidChangedWithItem:(WspxDownloadItem *)aDownloadedItem {
+    NSLog(@"onProgressDidChange --> %@", aDownloadedItem);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+    dispatch_async(queue, ^{
+        NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
+            if ([aItem.downloadIdentifier isEqualToString:aDownloadedItem.downloadIdentifier]) {
+                return YES;
             }
-            aDownloadedItem.lastUpdateTime = [NSDate date];
+            return NO;
+        }];
+        
+        if (aFoundDownloadItemIndex != NSNotFound) {
+            NSTimeInterval lastChangedUpdateDelta = 10.0;
+            if (aDownloadedItem.lastUpdateTime)
+            {
+                lastChangedUpdateDelta = [[NSDate date] timeIntervalSinceDate:aDownloadedItem.lastUpdateTime];
+            }
+            if (lastChangedUpdateDelta > 1) {
+                NSIndexPath *anIndexPath = [NSIndexPath indexPathForRow:aFoundDownloadItemIndex inSection:0];
+                if([[self.tableView indexPathsForVisibleRows] containsObject:anIndexPath]) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        UOneDownloadTableViewCell *cell = [self.tableView cellForRowAtIndexPath:anIndexPath];
+                        [cell resetWithDownloadItem:aDownloadedItem];
+                    });
+                }
+                aDownloadedItem.lastUpdateTime = [NSDate date];
+            }
+        } else {
+            NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
         }
-    } else {
-        NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
-    }
+    });
+    
 }
 
-- (void)onDownloadDidPending:(NSNotification *)aNotification {
-    WspxDownloadItem *aDownloadedItem = (WspxDownloadItem *)aNotification.object;
+- (void)downloadProgressDidPendingWithItem:(WspxDownloadItem *)aDownloadedItem {
     NSLog(@"onDownloadDidPending --> %@", aDownloadedItem);
     
     NSUInteger aFoundDownloadItemIndex = [self.downloadManager.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aItem, NSUInteger anIndex, BOOL *aStopFlag) {
@@ -470,6 +469,21 @@ UOneDownloadTableViewCellDelegate>
     } else {
         NSLog(@"WARN: Completed download item not found (%@, %d)", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
     }
+}
+
+- (void)downloadProgressReachableChanged:(UOMReachability *)reachability {
+    
+    if ([_dataSource respondsToSelector:@selector(downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:)]) {
+        if ([_dataSource downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:self]) {
+            UOMNetworkStatus status = reachability.currentReachabilityStatus;
+            if (status == UOMNotReachable) {
+                [self disableUserInterfaceWithNetworkNotReachable];
+            } else {
+                [self enableUserInterfaceWithNetworkReachable];
+            }
+        }
+    }
+    [self.tableView reloadRowsAtIndexPaths:[self.tableView indexPathsForVisibleRows] withRowAnimation:UITableViewRowAnimationNone];
 }
 - (void)onTotalProgressDidChange:(NSNotification *)aNotification {
     NSLog(@"onTotalProgressDidChange -->");
@@ -542,6 +556,9 @@ UOneDownloadTableViewCellDelegate>
 }
 
 - (void)handlePauseDownload:(WspxDownloadItem *)aDownloadItem {
+    if (aDownloadItem.downloadMaxAge > 600) {
+        aDownloadItem.isSupportResumeWithoutRestart = YES;
+    }
     if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForPause:)]) {
         [_delegate downloadViewController:self didClickDownloadItemForPause:aDownloadItem];
     }
@@ -746,20 +763,6 @@ UOneDownloadTableViewCellDelegate>
     _isUserInterfaceEnable = YES;
 }
 #pragma mark - PrivateMethod
-
-- (void)reachabilityChanged:(NSNotification *)note {
-    if ([_dataSource respondsToSelector:@selector(downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:)]) {
-        if ([_dataSource downloadViewControllerShouldAutoChangeUserInterfaceWithReachabilityStatusChange:self]) {
-            UOMReachability* curReach = [note object];
-            NetworkStatus status = curReach.currentReachabilityStatus;
-            if (status == NotReachable) {
-                 [self disableUserInterfaceWithNetworkNotReachable];
-            } else {
-                [self enableUserInterfaceWithNetworkReachable];
-            }
-        }
-    }
-}
 
 -(void) refreshDownloadList {
     [_downloadList removeAllObjects];

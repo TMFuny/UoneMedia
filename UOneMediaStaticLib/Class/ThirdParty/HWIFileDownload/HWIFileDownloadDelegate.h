@@ -109,7 +109,9 @@
  */
 - (void)resumeDownloadWithIdentifier:(nonnull NSString *)aDownloadIdentifier;
 
+- (void)downloadProgressDidStartWithIdentifier:(nonnull NSString*)aDownloadIdentifier;
 
+- (void)downloadProgressIsSupportResumeWithIdentifier:(nonnull NSString*)aDownloadIdentifier maxAge:(NSTimeInterval)maxAge;
 /**
  Optionally called when the HWIFileDownloader needs to store the downloaded data for a download item.
  @param aDownloadIdentifier Download identifier of the download item.

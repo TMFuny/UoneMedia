@@ -91,7 +91,7 @@
 		B63475031D059B9B001B3B20 /* SWUtilityButtonView.h in Headers */ = {isa = PBXBuildFile; fileRef = B63474F21D059B9B001B3B20 /* SWUtilityButtonView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B63475041D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */; };
 		B63475051D059B9B001B3B20 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = B63474F31D059B9B001B3B20 /* SWUtilityButtonView.m */; };
-		B65127811D1A41BE002DA5AA /* UOMReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B651277F1D1A41BE002DA5AA /* UOMReachability.h */; };
+		B65127811D1A41BE002DA5AA /* UOMReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = B651277F1D1A41BE002DA5AA /* UOMReachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B65127821D1A41BE002DA5AA /* UOMReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B65127801D1A41BE002DA5AA /* UOMReachability.m */; };
 		B6554D781D20F44100D27372 /* WspxDownloadPreviewItem.h in Headers */ = {isa = PBXBuildFile; fileRef = B6554D761D20F44100D27372 /* WspxDownloadPreviewItem.h */; };
 		B6554D791D20F44100D27372 /* WspxDownloadPreviewItem.m in Sources */ = {isa = PBXBuildFile; fileRef = B6554D771D20F44100D27372 /* WspxDownloadPreviewItem.m */; };

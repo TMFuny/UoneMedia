@@ -47,6 +47,7 @@
 
 
 @property (nonatomic, strong, nullable) NSDate *downloadStartDate;
+@property (nonatomic, assign) NSTimeInterval downloadMaxAge;
 @property (nonatomic, strong, nullable) NSString *downloadSuggestedFileName;
 @property (nonatomic, assign) int64_t receivedFileSizeInBytes;
 @property (nonatomic, assign) int64_t expectedFileSizeInBytes;
@@ -63,6 +64,8 @@
 @property (nonatomic, assign) NSInteger lastHttpStatusCode;
 @property (nonatomic, strong, nullable) NSURL *finalLocalFileURL;
 @property (nonatomic, assign) BOOL isSupportResumeWithoutRestart;
+
+@property (nonatomic, assign) NSTimeInterval lastChangeTime;
 
 - (nullable HWIFileDownloadItem *)init __attribute__((unavailable("use initWithDownloadToken:sessionDownloadTask:urlConnection:")));
 + (nullable HWIFileDownloadItem *)new __attribute__((unavailable("use initWithDownloadToken:sessionDownloadTask:urlConnection:")));

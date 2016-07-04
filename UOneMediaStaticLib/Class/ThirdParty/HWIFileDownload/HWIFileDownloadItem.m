@@ -67,6 +67,7 @@
         self.bytesPerSecondSpeed = 0;
         self.resumedFileSizeInBytes = 0;
         self.lastHttpStatusCode = 0;
+        self.downloadMaxAge = 0;
         
         self.progress = [[NSProgress alloc] initWithParent:[NSProgress currentProgress] userInfo:nil];
         if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
@@ -120,6 +121,7 @@
 - (NSString *)description
 {
     NSMutableDictionary *aDescriptionDict = [NSMutableDictionary dictionary];
+    [aDescriptionDict setObject:@(self.downloadMaxAge) forKey:@"downloadMaxAge"];
     [aDescriptionDict setObject:@(self.receivedFileSizeInBytes) forKey:@"receivedFileSizeInBytes"];
     [aDescriptionDict setObject:@(self.expectedFileSizeInBytes) forKey:@"expectedFileSizeInBytes"];
     [aDescriptionDict setObject:@(self.bytesPerSecondSpeed) forKey:@"bytesPerSecondSpeed"];

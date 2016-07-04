@@ -62,53 +62,55 @@ static PKDownloadButton *CommonInit(PKDownloadButton *self) {
 #pragma mark - Properties
 
 - (void)setState:(PKDownloadButtonState)state {
-    _state = state;
-    
-    [self.stateViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        SafeObjClassCast(UIView, view, obj);
-        view.hidden = YES;
-    }];
-    
-    self.hidden = NO;
-    self.userInteractionEnabled = YES;
-    
-    switch (state) {
-        case kPKDownloadButtonState_StartDownload:
-            self.startDownloadButton.hidden = NO;
-            self.downloadingButton.pkProgress = 0.f;
-            NSLog(@"downloadButton state: StartDownLaod");
-            break;
-        case kPKDownloadButtonState_Pending:
-            self.pendingView.hidden = NO;
-//            [self.pendingView startSpin];
-            NSLog(@"downloadButton state: Pending");
-            break;
-        case kPKDownloadButtonState_Downloading:
-            self.downloadingButton.hidden = NO;
-            NSLog(@"downloadButton state: downloading");
-            break;
-        case kPKDownloadButtonState_Pausing:
-            self.pauseDownloadButton.hidden = NO;
-            NSLog(@"downloadButton state: Pausing");
-        break;
-        case kPKDownloadButtonState_Downloaded:
-        {
-            self.downloadedButton.hidden = NO;
-            self.hidden = YES;
-            self.userInteractionEnabled = NO;
-            NSLog(@"downloadButton state: Downloaded");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        _state = state;
+        [self.stateViews enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            SafeObjClassCast(UIView, view, obj);
+            view.hidden = YES;
+        }];
+        
+        self.hidden = NO;
+        self.userInteractionEnabled = YES;
+        
+        switch (state) {
+            case kPKDownloadButtonState_StartDownload:
+                self.startDownloadButton.hidden = NO;
+                self.downloadingButton.pkProgress = 0.f;
+                NSLog(@"downloadButton state: StartDownLaod");
+                break;
+            case kPKDownloadButtonState_Pending:
+                self.pendingView.hidden = NO;
+                //            [self.pendingView startSpin];
+                NSLog(@"downloadButton state: Pending");
+                break;
+            case kPKDownloadButtonState_Downloading:
+                self.downloadingButton.hidden = NO;
+                NSLog(@"downloadButton state: downloading");
+                break;
+            case kPKDownloadButtonState_Pausing:
+                self.pauseDownloadButton.hidden = NO;
+                NSLog(@"downloadButton state: Pausing");
+                break;
+            case kPKDownloadButtonState_Downloaded:
+            {
+                self.downloadedButton.hidden = NO;
+                self.hidden = YES;
+                self.userInteractionEnabled = NO;
+                NSLog(@"downloadButton state: Downloaded");
+            }
+                break;
+            case kPKDownloadButtonState_Error:
+            {
+                self.hidden = YES;
+                self.userInteractionEnabled = NO;
+            }
+                break;
+            default:
+                NSAssert(NO, @"downloadButton unsupported state");
+                break;
         }
-            break;
-        case kPKDownloadButtonState_Error:
-        {
-            self.hidden = YES;
-            self.userInteractionEnabled = NO;
-        }
-            break;
-        default:
-            NSAssert(NO, @"downloadButton unsupported state");
-            break;
-    }
+    });
+    
 }
 
 #pragma mark - Initialization
