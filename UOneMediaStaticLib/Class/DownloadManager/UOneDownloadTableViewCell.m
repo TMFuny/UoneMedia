@@ -37,7 +37,7 @@
     [self.fileLabel setFont:[UIFont systemFontOfSize:15]];
     [self.sizeLabel setFont:[UIFont systemFontOfSize:13]];
     self.fileLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
-    
+
     [self.fileLabel setTextColor:UIColorFromHex(0x565656)];
     [self.sizeLabel setTextColor:UIColorFromHex(0xbdbdbd)];
     [self initDownloadButton];

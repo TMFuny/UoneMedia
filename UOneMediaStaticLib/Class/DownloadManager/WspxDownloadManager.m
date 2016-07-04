@@ -455,6 +455,54 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     }
 }
 
+- (void)downloadProgressChangedForIdentifier2:(nonnull NSString *)aDownloadIdentifier expectedContentLength:(long long)expectedContentLength
+{
+    NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aDownloadItem.downloadIdentifier isEqualToString:aDownloadIdentifier])
+        {
+            return YES;
+        }
+        return NO;
+    }];
+    WspxDownloadItem *aChangedDownloadItem = nil;
+    if (aFoundDownloadItemIndex != NSNotFound)
+    {
+        aChangedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
+        if (aChangedDownloadItem.status == WspxDownloadItemStatusPending)
+        {
+            aChangedDownloadItem.status = WspxDownloadItemStatusStarted;
+        }
+        
+        if (!aChangedDownloadItem.downloadSuggestedFileName) {
+            aChangedDownloadItem.downloadSuggestedFileName = [_fileDownloader downloadItemSuggestedFileNameForDownloadID:aDownloadIdentifier];
+        }
+        HWIFileDownloadProgress *aFileDownloadProgress = [_fileDownloader downloadProgressForIdentifier:aDownloadIdentifier];
+        if (aFileDownloadProgress)
+        {
+            [aChangedDownloadItem setValue:aFileDownloadProgress forKey:@"progress"];
+            if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+            {
+                aFileDownloadProgress.lastLocalizedDescription = aFileDownloadProgress.nativeProgress.localizedDescription;
+                aFileDownloadProgress.lastLocalizedAdditionalDescription = aFileDownloadProgress.nativeProgress.localizedAdditionalDescription;
+            }
+        }
+        aChangedDownloadItem.isSupportResumeWithoutRestart = [_fileDownloader isSupportResumeWithoutRestartForDownloadID:aDownloadIdentifier];
+        if (expectedContentLength != -1) {//不知道文件长度的也继续下载
+            
+            if (expectedContentLength > [self getFreeDiskspaceInBytes]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
+                NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu", __PRETTY_FUNCTION__, aChangedDownloadItem.expectedFileSizeInBytes, [self getFreeDiskspaceInBytes]);
+                [self pauseDownloadWithItem:aChangedDownloadItem];
+            }
+        }
+    }
+    
+    NSLog(@"onProgressDidChange --> %@", aChangedDownloadItem);
+    
+    [self storeDownloadItems];
+    [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadProgressChangedNotification object:aChangedDownloadItem];
+}
+
 - (void)downloadProgressChangedForIdentifier:(nonnull NSString *)aDownloadIdentifier
 {
     NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {

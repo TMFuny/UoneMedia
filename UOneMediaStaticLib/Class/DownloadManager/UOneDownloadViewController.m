@@ -287,15 +287,11 @@ WspxDownloadManagerDelegate>
         NSInteger row = indexPath.row;
         WspxDownloadItem* item = _downloadList[row];
         NSLog(@"downloadItem:%@", item);
-        
         [(UOneDownloadTableViewCell*)cell resetWithDownloadItem:item];
         
     }
 }
 
-- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-}
 #pragma mark UIDocumentInteractionControllerDelegate
 - (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller {
     if (self.navigationController) {

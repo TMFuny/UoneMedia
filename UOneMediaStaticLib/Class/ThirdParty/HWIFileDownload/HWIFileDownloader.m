@@ -863,6 +863,15 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
             if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
                 [self.fileDownloadDelegate downloadStorageAlmostFull];
                 NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [aDownloadTask.response expectedContentLength], [self getFreeDiskspaceInBytes], aDownloadTask.originalRequest.URL, aDownloadTask.taskDescription, aDownloadTask.response);
+                if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadProgressChangedForIdentifier2:expectedContentLength:)])
+                {
+                    NSString *aTaskDescription = [aDownloadTask.taskDescription copy];
+                    if (aTaskDescription)
+                    {
+                        [self.fileDownloadDelegate downloadProgressChangedForIdentifier2:aTaskDescription expectedContentLength:[aDownloadTask.response expectedContentLength]];
+                    }
+                }
+                return;
             }
         }
     }

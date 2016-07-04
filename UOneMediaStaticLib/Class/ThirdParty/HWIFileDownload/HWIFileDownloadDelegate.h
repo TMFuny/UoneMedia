@@ -90,7 +90,7 @@
  @discussion Use HWIFileDownloader's downloadProgressForIdentifier: to access the current download progress of a download item at any time.
  */
 - (void)downloadProgressChangedForIdentifier:(nonnull NSString *)aDownloadIdentifier;
-
+- (void)downloadProgressChangedForIdentifier2:(nonnull NSString *)aDownloadIdentifier expectedContentLength:(long long)expectedContentLength;
 
 /**
  Optionally called on a paused download.
