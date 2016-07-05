@@ -120,6 +120,7 @@
 
 - (void)resetWithDownloadItem : ( WspxDownloadItem * _Nonnull )aDownloadItem {
     NSString *title = @"未知文件";
+    _downloadItem = aDownloadItem;
     if (aDownloadItem.downloadSuggestedFileName && [aDownloadItem.downloadSuggestedFileName length] != 0) {
         title = aDownloadItem.downloadSuggestedFileName;
     } else {
@@ -134,12 +135,10 @@
     CGFloat progress = aDownloadItem.downloadProgress;
     
     WspxDownloadItemStatus downloadStatus = aDownloadItem.status;
-    if (downloadStatus == WspxDownloadItemStatusStarted || downloadStatus == WspxDownloadItemStatusPending) {
-        UOMNetworkStatus networkStatus = [[WspxDownloadManager shareInstance] internetReachability].currentReachabilityStatus;
-        if (networkStatus == UOMNotReachable) {
-            downloadStatus = WspxDownloadItemStatusInterrupted;
-        }
-    }
+
+    self.downloadButton.pauseDownloadButton.pkProgress = 0;
+    self.downloadButton.downloadingButton.pkProgress = 0;
+    self.downloadButton.state = kPKDownloadButtonState_Downloaded;
     switch (downloadStatus) {
         case WspxDownloadItemStatusNotStarted:
         {
@@ -204,7 +203,6 @@
     } else {
          self.sizeLabel.text = sizeString;
     }
-    _downloadItem = aDownloadItem;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -313,8 +311,12 @@
 }
 
 - (NSString *)jointWithExpectedSize:(int64_t)expectedSize receivedSize:(int64_t)receivedSize {
+    NSString *expectedSizeStr = @"未知大小";
+    if (expectedSize != -1) {
+        expectedSizeStr = [self toStringWithBytes:(double)expectedSize];
+    }
     return [NSString stringWithFormat:@"%@/%@", [self toStringWithBytes:(double)receivedSize],
-                                                [self toStringWithBytes:(double)expectedSize]];
+                                                expectedSizeStr];
 }
 
 - (NSString *)toStringWithBytes:(double)bytes {

@@ -14,7 +14,7 @@
 @property (nonatomic, strong, nullable) HWIFileDownloadProgress *progress;
 @property (nonatomic, strong, readwrite, nonnull) NSString *downloadIdentifier;
 @property (nonatomic, strong, readwrite, nonnull) NSURL *remoteURL;
-
+@property (nonatomic, assign, readwrite) int64_t lastReceivedFileSizeInBytes;
 @end
 
 
@@ -161,9 +161,16 @@
 }
 
 - (NSUInteger)bytesPerSecondSpeed {
-    if (self.progress) {
-        return self.progress.bytesPerSecondSpeed;
+    NSUInteger speed = 0;
+    NSDate *now = [NSDate new];
+    if (self.lastSpeedTime == nil) {
+        self.lastSpeedTime = now;
     }
-    return 0;
+    NSUInteger diff =  self.receivedFileSizeInBytes - self.lastReceivedFileSizeInBytes;
+    speed = diff * 1.0 / [now timeIntervalSinceDate:self.lastSpeedTime];
+    self.lastReceivedFileSizeInBytes = self.receivedFileSizeInBytes;
+    self.lastSpeedTime = now;
+    
+    return speed;
 }
 @end

@@ -68,6 +68,10 @@
                   errorMessagesStack:(nullable NSArray<NSString *> *)anErrorMessagesStack
                           resumeData:(nullable NSData *)aResumeData;
 
+- (void)downloadStorageAlmostFullWithIdentifier:(nonnull NSString *)aDownloadIdentifier
+                                          error:(nonnull NSError *)anError
+                                 httpStatusCode:(NSInteger)aHttpStatusCode
+                             errorMessagesStack:(nullable NSArray<NSString *> *)anErrorMessagesStack;
 /**
  Called when the network activity indicator should be displayed because a download started.
  @discussion Use UIApplication's setNetworkActivityIndicatorVisible: to actually set the visibility of the network activity indicator.

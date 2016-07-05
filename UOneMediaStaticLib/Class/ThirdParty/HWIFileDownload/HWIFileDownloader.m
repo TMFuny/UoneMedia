@@ -232,11 +232,27 @@
             aDataTask = [[NSURLSession sharedSession] dataTaskWithRequest:dataRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
                 NSLog(@"responseHeaderFields:%@ data:%@",response, data);
                 [self handleDownloadWithResponse:response Identifier:aDownloadToken];
+                if([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                    NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)response;
+                    NSInteger aHttpStatusCode = aHttpResponse.statusCode;
+                    if (aHttpStatusCode == 404) {
+                        if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadFailedWithIdentifier:error:httpStatusCode:errorMessagesStack:resumeData:)]) {
+                            NSError *aCancelledError = [[NSError alloc] initWithDomain:NSURLErrorDomain code:404 userInfo:nil];
+                            [self.fileDownloadDelegate downloadFailedWithIdentifier:aDownloadToken error:aCancelledError httpStatusCode:404 errorMessagesStack:nil resumeData:nil];
+                            [aDataTask cancel];
+                            return;
+                        }
+                    }
+                }
                 if ([response expectedContentLength] != -1) {
                     if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
                         
                         if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
                             [self.fileDownloadDelegate downloadStorageAlmostFull];
+                            if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFullWithIdentifier:error:httpStatusCode:errorMessagesStack:)]) {
+                                NSError *aCancelledError = [[NSError alloc] initWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil];
+                                [self.fileDownloadDelegate downloadStorageAlmostFullWithIdentifier:aDownloadToken error:aCancelledError httpStatusCode:0 errorMessagesStack:nil];
+                            }
                             NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [response expectedContentLength], [self getFreeDiskspaceInBytes], aRemoteURL, aDownloadToken, response);
                         }
                     } else {
@@ -703,11 +719,26 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
      NSLog(@"responseHeaderFields:%@",response);
     [self handleDownloadWithResponse:response Identifier:dataTask.taskDescription];
     
+    if([response isKindOfClass:[NSHTTPURLResponse class]]) {
+        NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)response;
+        NSInteger aHttpStatusCode = aHttpResponse.statusCode;
+        if (aHttpStatusCode == 404) {
+            if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadFailedWithIdentifier:error:httpStatusCode:errorMessagesStack:resumeData:)]) {
+                 NSError *aCancelledError = [[NSError alloc] initWithDomain:NSURLErrorDomain code:404 userInfo:nil];
+                [self.fileDownloadDelegate downloadFailedWithIdentifier:dataTask.taskDescription error:aCancelledError httpStatusCode:404 errorMessagesStack:nil resumeData:nil];
+                return;
+            }
+        }
+    }
     if ([response expectedContentLength] != -1) {
         if ([response expectedContentLength] > [self getFreeDiskspaceInBytes]) {
             
             if ([self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFull)]) {
                 [self.fileDownloadDelegate downloadStorageAlmostFull];
+                if (self.fileDownloadDelegate && [self.fileDownloadDelegate respondsToSelector:@selector(downloadStorageAlmostFullWithIdentifier:error:httpStatusCode:errorMessagesStack:)]) {
+                    NSError *aCancelledError = [[NSError alloc] initWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil];
+                    [self.fileDownloadDelegate downloadStorageAlmostFullWithIdentifier:dataTask.taskDescription error:aCancelledError httpStatusCode:0 errorMessagesStack:nil];
+                }
                 NSLog(@"post wspxDownloadDiskStorageNotEnoughNotification on:%s expectedSize:%llu freeSpace:%llu originalUrl:%@ taskDesc:%@ respone:%@", __PRETTY_FUNCTION__, [response expectedContentLength], [self getFreeDiskspaceInBytes], dataTask.originalRequest.URL, dataTask.taskDescription, response);
             }
         } else {
@@ -882,6 +913,14 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
             aDownloadItem.downloadStartDate = [NSDate date];
         }
         
+        if([aDownloadTask.response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *aHttpResponse = (NSHTTPURLResponse *)aDownloadTask.response;
+            NSInteger aHttpStatusCode = aHttpResponse.statusCode;
+            if (aHttpStatusCode == 404) {
+                aTotalBytesWrittenCount = 0;
+                aTotalBytesExpectedToWriteCount = 0;
+            }
+        }
         aDownloadItem.receivedFileSizeInBytes = aTotalBytesWrittenCount;
         aDownloadItem.expectedFileSizeInBytes = aTotalBytesExpectedToWriteCount;
         NSString *suggesFileName = aDownloadTask.response.suggestedFilename;
@@ -1472,6 +1511,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)aChallenge
 {
     HWIFileDownloadProgress *aDownloadProgress = nil;
     HWIFileDownloadItem *aDownloadItem = [self.activeDownloadsDictionary objectForKey:@(aDownloadID)];
+
     if (aDownloadItem)
     {
         float aDownloadProgressFloat = 0.0;

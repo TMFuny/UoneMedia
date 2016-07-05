@@ -429,7 +429,57 @@ NSString* _Nonnull const wspxDownloadDiskStorageNotEnoughNotification   = @"wspx
     
 }
 
-
+- (void)downloadStorageAlmostFullWithIdentifier:(NSString *)aDownloadIdentifier
+                                          error:(NSError *)anError
+                                 httpStatusCode:(NSInteger)aHttpStatusCode
+                             errorMessagesStack:(NSArray<NSString *> *)anErrorMessagesStack {
+    
+    NSUInteger aFoundDownloadItemIndex = [self.downloadItems indexOfObjectPassingTest:^BOOL(WspxDownloadItem *aDownloadItem, NSUInteger anIndex, BOOL *aStopFlag) {
+        if ([aDownloadItem.downloadIdentifier isEqualToString:aDownloadIdentifier]) {
+            return YES;
+        }
+        return NO;
+    }];
+    WspxDownloadItem *aFailedDownloadItem = nil;
+    if (aFoundDownloadItemIndex != NSNotFound) {
+        aFailedDownloadItem = [self.downloadItems objectAtIndex:aFoundDownloadItemIndex];
+        aFailedDownloadItem.lastHttpStatusCode = aHttpStatusCode;
+        aFailedDownloadItem.downloadError = anError;
+        aFailedDownloadItem.downloadErrorMessagesStack = anErrorMessagesStack;
+        // download status heuristics
+        if ([anError.domain isEqualToString:NSURLErrorDomain] && (anError.code == NSURLErrorCannotCreateFile)) {
+            aFailedDownloadItem.status = WspxDownloadItemStatusInterrupted;
+        } else {
+            aFailedDownloadItem.status = WspxDownloadItemStatusError;
+        }
+        [self storeDownloadItems];
+        
+        switch (aFailedDownloadItem.status) {
+            case WspxDownloadItemStatusError:
+                NSLog(@"ERR: Download with error %@ (http status: %@) - id: %@ (%@, %d)", @(anError.code), @(aHttpStatusCode), aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+                break;
+            case WspxDownloadItemStatusInterrupted:
+                NSLog(@"ERR: Download interrupted with error %@ - id: %@ (%@, %d)", @(anError.code), aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+                break;
+            case WspxDownloadItemStatusCancelled:
+                NSLog(@"INFO: Download cancelled - id: %@ (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+                break;
+            case WspxDownloadItemStatusPaused:
+                NSLog(@"INFO: Download paused - id: %@ (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+                break;
+                
+            default:
+                break;
+        }
+    } else {
+        NSLog(@"ERR: Failed download item not found (id: %@) (%@, %d)", aDownloadIdentifier, [NSString stringWithUTF8String:__FILE__].lastPathComponent, __LINE__);
+    }
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(downloadProgressDidCompleteWithItem:)]) {
+        [self.delegate downloadProgressDidCompleteWithItem:aFailedDownloadItem];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDidCompleteNotification object:aFailedDownloadItem];
+}
 
 #pragma mark HWIFileDownloadDelegate (optional)
 

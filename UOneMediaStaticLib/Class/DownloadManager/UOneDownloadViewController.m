@@ -17,7 +17,7 @@
 #import "UoneDownloadToolbar.h"
 #import "WSPXAlertManager.h"
 
-
+static const CGFloat kDefaultSpaceThreshold = 52428800.f;//默认的内存不足的阀值
 
 @interface UOneDownloadViewController ()<QLPreviewControllerDataSource,
 QLPreviewControllerDelegate,
@@ -39,6 +39,7 @@ WspxDownloadManagerDelegate>
     WSPXAlertManager* _alertManager;
     NSMutableArray* _downloadList;
     NSMutableArray* _deleteList;
+    NSTimer *_refreshTimer;
 }
 
 - (instancetype)init {
@@ -52,7 +53,7 @@ WspxDownloadManagerDelegate>
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-  
+    [self startTimer];
     // Do any additional setup after loading the view from its nib.
     self.downloadManager = [WspxDownloadManager shareInstance];
     self.downloadManager.delegate = self;
@@ -141,8 +142,27 @@ WspxDownloadManagerDelegate>
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    self.downloadManager.delegate = nil;
+    [self endTimer];
+}
+
 - (void)dealloc {
     [self unregisterNotification];
+}
+
+- (void)startTimer {
+    [_refreshTimer invalidate];
+    _refreshTimer = nil;
+    NSTimeInterval timeInterval = 5;
+    _refreshTimer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSinceNow:timeInterval] interval:timeInterval target:self selector:@selector(refreshItemSpeed) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSRunLoopCommonModes];
+}
+
+- (void)endTimer {
+    [_refreshTimer invalidate];
+    _refreshTimer = nil;
 }
 #pragma mark - UIInit
 #pragma mark - UIConfig
@@ -185,7 +205,10 @@ WspxDownloadManagerDelegate>
         _blankView.hidden = YES;
     }
 }
-
+- (void)refreshItemSpeed {
+    NSLog(@"refreshItemSpeed");
+    [self.tableView reloadRowsAtIndexPaths:[self.tableView indexPathsForVisibleRows] withRowAnimation:UITableViewRowAnimationNone];
+}
 #pragma mark - AppleDataSource and Delegate
 #pragma mark - UITableViewDelegate
 
@@ -211,36 +234,8 @@ WspxDownloadManagerDelegate>
         return;
     }
     WspxDownloadItem* item = _downloadList[indexPath.row];
-    WspxDownloadItemStatus itemStatus = item.status;
-   
-    switch (itemStatus) {
-        case WspxDownloadItemStatusNotStarted:
-        case WspxDownloadItemStatusCancelled:
-        case WspxDownloadItemStatusInterrupted:
-        case WspxDownloadItemStatusError:
-        {
-            [self handleStartDownload:item];
-        }
-            break;
-        case WspxDownloadItemStatusPending:
-        case WspxDownloadItemStatusStarted:
-            break;
-        case WspxDownloadItemStatusPaused:
-        {
-            [self handleResumeDownload:item];
-        }
-            break;
-        case WspxDownloadItemStatusCompleted:
-        {
-            if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickCellForPreview:)]) {
-                [_delegate downloadViewController:self didClickCellForPreview:indexPath];
-            }
-            [self handlePreviewDownload:item withIndexPath:indexPath];
-            
-        }
-            break;
-    }
-    
+    [self handleDownloadItem:item indexPath:indexPath];
+
 }
 
 #pragma mark UITableViewDataSource
@@ -254,6 +249,7 @@ WspxDownloadManagerDelegate>
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+        NSLog(@"%s, row:%d", __FUNCTION__, indexPath.row);
     NSString * identifier = @"kUOneDownloadTableViewCellIdentifier";
     UOneDownloadTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
@@ -282,11 +278,12 @@ WspxDownloadManagerDelegate>
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"%s, row:%d", __FUNCTION__, indexPath.row);
     if ([cell isKindOfClass:[UOneDownloadTableViewCell class]]) {
         
         NSInteger row = indexPath.row;
         WspxDownloadItem* item = _downloadList[row];
-        NSLog(@"downloadItem:%@", item);
+  //      NSLog(@"downloadItem:%@", item);
         [(UOneDownloadTableViewCell*)cell resetWithDownloadItem:item];
         
     }
@@ -487,21 +484,24 @@ WspxDownloadManagerDelegate>
 
 #pragma mark - UOneDownloadTableViewCellDelegate
 - (void)tableViewCell:(nonnull UOneDownloadTableViewCell *)cell didClickedDownloadButton:(nonnull UIButton *)button {
+    if (self.tableView.isEditing) {
+        return;
+    }
     NSIndexPath * indexPath = [self.tableView indexPathForCell:cell];
     NSInteger row = indexPath.row;
     if (row < _downloadList.count) {
         WspxDownloadItem * downloadItem = _downloadList[row];
         switch (downloadItem.status) {
             case WspxDownloadItemStatusNotStarted:
-            case WspxDownloadItemStatusError:
+            case WspxDownloadItemStatusCancelled:
             case WspxDownloadItemStatusInterrupted:
+            case WspxDownloadItemStatusError:
                 [self handleStartDownload:downloadItem];
                 break;
             case WspxDownloadItemStatusCompleted:
                 if ([downloadItem.downloadErrorMessagesStack count] > 0) {
                     NSLog(@"error stack: %@", downloadItem.downloadErrorMessagesStack);
                 }
-            case WspxDownloadItemStatusCancelled:
                 break;
             case WspxDownloadItemStatusPending:
             case WspxDownloadItemStatusStarted:
@@ -515,12 +515,49 @@ WspxDownloadManagerDelegate>
     
 }
 
+- (void)handleDownloadItem:(WspxDownloadItem *)item indexPath:(NSIndexPath *)indexPath {
+    WspxDownloadItemStatus itemStatus = item.status;
+    
+    switch (itemStatus) {
+        case WspxDownloadItemStatusNotStarted:
+        case WspxDownloadItemStatusCancelled:
+        case WspxDownloadItemStatusInterrupted:
+        case WspxDownloadItemStatusError:
+        {
+            [self handleStartDownload:item];
+        }
+            break;
+        case WspxDownloadItemStatusPending:
+        case WspxDownloadItemStatusStarted:
+            break;
+        case WspxDownloadItemStatusPaused:
+        {
+            [self handleResumeDownload:item];
+        }
+            break;
+        case WspxDownloadItemStatusCompleted:
+        {
+            if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickCellForPreview:)]) {
+                [_delegate downloadViewController:self didClickCellForPreview:indexPath];
+            }
+            [self handlePreviewDownload:item withIndexPath:indexPath];
+            
+        }
+            break;
+    }
+}
+
 - (void)handleStartDownload:(WspxDownloadItem *)aDownloadItem {
     if (_delegate && [_delegate respondsToSelector:@selector(downloadViewController:didClickDownloadItemForStart:)]) {
         [_delegate downloadViewController:self didClickDownloadItemForStart:aDownloadItem];
     }
     
     if (!_isUserInterfaceEnable) {
+        return;
+    }
+    
+    if (aDownloadItem.expectedFileSizeInBytes > [self.downloadManager getFreeDiskspaceInBytes] || [self.downloadManager getFreeDiskspaceInBytes] <= kDefaultSpaceThreshold) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
         return;
     }
     
@@ -539,6 +576,10 @@ WspxDownloadManagerDelegate>
     }
     
     if (!_isUserInterfaceEnable) {
+        return;
+    }
+    if (aDownloadItem.expectedFileSizeInBytes > [self.downloadManager getFreeDiskspaceInBytes] || [self.downloadManager getFreeDiskspaceInBytes] <= kDefaultSpaceThreshold) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:wspxDownloadDiskStorageNotEnoughNotification object:nil];
         return;
     }
     
